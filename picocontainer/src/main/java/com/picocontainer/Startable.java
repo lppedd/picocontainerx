@@ -11,27 +11,36 @@
 package com.picocontainer;
 
 /**
- * <p>An interface which is implemented by components that can be started and stopped. The {@link Startable#start()}
- * must be called at the begin of the component lifecycle. It can be called again only after a call to
- * {@link Startable#stop()}. The {@link Startable#stop()} method must be called at the end of the component lifecycle,
- * and can further be called after every {@link Startable#start()}. If a component implements the {@link Disposable}
- * interface as well, {@link Startable#stop()} should be called before {@link Disposable#dispose()}.</p>
- * <p/>
- * <p>For more advanced and pluggable lifecycle support, see the functionality offered by picocontainer-gems
- * subproject.</p>
- * @see com.picocontainer.Disposable the Disposable interface if you need to <code>dispose()</code> semantics.
+ * <p>
+ * An interface which is implemented by components that can be started and stopped.
+ * The {@link Startable#start()} must be called at the begin of the component lifecycle,
+ * and it can be called again only after a call to {@link Startable#stop()}.
+ * <p>
+ * The {@link Startable#stop()} method must be called at the end of the component lifecycle,
+ * and it can further be called after every {@link Startable#start()}.
+ * <p>
+ * If a component implements the {@link Disposable} interface as well,
+ * {@link Startable#stop()} should be called before {@link Disposable#dispose()}.
+ * </p>
+ * <p>For more advanced and pluggable lifecycle support, see the functionality offered by
+ * {@code picocontainer-gems} subproject.
+ * </p>
+ *
  * @author Paul Hammant
  * @author Aslak Helles&oslash;y
+ * @see Disposable the Disposable interface if you need to dispose() semantics.
  */
 public interface Startable {
-    /**
-     * Start this component. Called initially at the begin of the lifecycle. It can be called again after a stop.
-     */
-    void start();
+  /**
+   * Start this component.
+   * Called initially at the beginning of the lifecycle, it can be called again after a stop.
+   */
+  void start();
 
-    /**
-     * Stop this component. Called near the end of the lifecycle. It can be called again after a further start. Implement
-     * {@link Disposable} if you need a single call at the definite end of the lifecycle.
-     */
-    void stop();
+  /**
+   * Stop this component.
+   * Called near the end of the lifecycle, it can be called again after a further start.
+   * Implement {@link Disposable} if you need a single call at the definitive end of the lifecycle.
+   */
+  void stop();
 }
