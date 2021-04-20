@@ -11,32 +11,37 @@ package com.picocontainer;
 import java.lang.reflect.Type;
 
 /**
- * Implementers are responsible for instantiating and injecting dependancies into
- * Constructors, Methods and Fields.
+ * Implementers are responsible for instantiating and injecting dependencies
+ * into constructors, methods and fields.
  */
 public interface Injector<T> extends ComponentAdapter<T> {
+  /**
+   * A preexisting component instance can be injected into after instantiation.
+   *
+   * @param container the container that can provide injectable dependencies
+   * @param into
+   * @param instance the instance to
+   */
+  Object decorateComponentInstance(
+      final PicoContainer container,
+      final Type into,
+      final T instance
+  );
 
-    /**
-     * A preexiting component instance can be injected into after instantiation
-     *
-     *
-     * @param container the container that can provide injectable dependencies
-     * @param into
-     * @param instance the instance to
-     * @return
-     */
-    Object decorateComponentInstance(PicoContainer container, Type into, T instance);
-
-
-    /**
-     * Does a partial decoration. This is necessary since in composite injection, you need to
-     * inject the superclass fields/methods first before injecting the subtype fields/methods.
-     * @param container
-     * @param into
-     * @param instance the instance we're decorating.
-     * @param superclassPortion the portion of the object to decorate.
-     * @return
-     */
-    Object partiallyDecorateComponentInstance(PicoContainer container, Type into, T instance, Class<?> superclassPortion);
-
+  /**
+   * Does a partial decoration.
+   * This is necessary since in composite injection, you need to inject
+   * the superclass fields/methods first before injecting the subtype fields/methods.
+   *
+   * @param container
+   * @param into
+   * @param instance the instance we're decorating.
+   * @param superclassPortion the portion of the object to decorate.
+   */
+  Object partiallyDecorateComponentInstance(
+      final PicoContainer container,
+      final Type into,
+      final T instance,
+      final Class<?> superclassPortion
+  );
 }
