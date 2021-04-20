@@ -11,13 +11,11 @@
 package com.picocontainer;
 
 /**
- * Behaviors modify the components created by a Injector with additional behaviors
+ * Behaviors modify the components created by a Injector with additional behaviors.
  *
  * @author Paul Hammant
- * @author J&ouml;rg Schaible
+ * @author Jörg Schaible
  * @author Mauro Talevi
  * @see LifecycleStrategy
  */
-public interface ChangedBehavior<T> extends ComponentAdapter<T>, ComponentLifecycle<T> {
-
-}
+public interface ChangedBehavior<T> extends ComponentAdapter<T>, ComponentLifecycle<T> {}
