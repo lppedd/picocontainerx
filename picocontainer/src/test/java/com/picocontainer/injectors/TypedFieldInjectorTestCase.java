@@ -9,17 +9,11 @@
  *****************************************************************************/
 package com.picocontainer.injectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-import org.junit.Test;
-
 import com.picocontainer.DefaultPicoContainer;
 import com.picocontainer.MutablePicoContainer;
-import com.picocontainer.injectors.AbstractInjector;
-import com.picocontainer.injectors.TypedFieldInjection;
 import com.picocontainer.monitors.NullComponentMonitor;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TypedFieldInjectorTestCase {
 
@@ -44,8 +38,8 @@ public class TypedFieldInjectorTestCase {
         				+ " " + Float.class.getName(), true) );
         pico.addComponent(PogoStick.class, new PogoStick());
         Helicopter chopper = pico.getComponent(Helicopter.class);
-        assertNotNull(chopper);
-        assertNotNull(chopper.pogo);
+        Assertions.assertNotNull(chopper);
+        Assertions.assertNotNull(chopper.pogo);
     }
 
 
@@ -58,13 +52,13 @@ public class TypedFieldInjectorTestCase {
         pico.addComponent(Hulahoop.class, new Hulahoop());
         try {
             pico.getComponent(Helicopter.class);
-            fail("should have barfed");
+            Assertions.fail("should have barfed");
         } catch (AbstractInjector.UnsatisfiableDependenciesException e) {
         	e.printStackTrace();
             String expected = "Helicopter has unsatisfied dependency for fields [ Helicopter.pogo (field's type is PogoStick) ] from parent:2<|";
             String actual = e.getMessage();
             actual = actual.replace(TypedFieldInjectorTestCase.class.getName() + "$", "");
-            assertEquals(expected, actual);
+            Assertions.assertEquals(expected, actual);
         }
     }
 }
