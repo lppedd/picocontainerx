@@ -9,12 +9,13 @@
 
 package com.picocontainer;
 
-
 /**
  * <p>
  * Interface responsible for changing monitoring strategy.
- * It may be implemented by {@link com.picocontainer.PicoContainer containers} and
- * single {@link com.picocontainer.ComponentAdapter component adapters}.
+ * It may be implemented by {@link PicoContainer containers} and
+ * single {@link ComponentAdapter component adapters}.
+ * </p>
+ * <p>
  * The choice of supporting the monitor strategy is left to the
  * implementers of the container and adapters.
  * </p>
@@ -24,18 +25,18 @@ package com.picocontainer;
  * @author Mauro Talevi
  */
 public interface ComponentMonitorStrategy {
+  /**
+   * Changes the {@code ComponentMonitor} used.
+   *
+   * @param monitor the new {@code ComponentMonitor} to use
+   * @return the old {@code ComponentMonitor}
+   */
+  ComponentMonitor changeMonitor(final ComponentMonitor monitor);
 
-    /**
-     * Changes the component monitor used
-     * @param monitor the new ComponentMonitor to use
-     * @return the old monitor
-     */
-	ComponentMonitor changeMonitor(ComponentMonitor monitor);
-
-    /**
-     * Returns the monitor currently used
-     * @return The ComponentMonitor currently used
-     */
-    ComponentMonitor currentMonitor();
-
+  /**
+   * Returns the monitor currently used.
+   *
+   * @return The {@code ComponentMonitor} currently used
+   */
+  ComponentMonitor currentMonitor();
 }
