@@ -8,27 +8,33 @@
  *****************************************************************************/
 package com.picocontainer;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
- * A way to refer to objects that are stored in "awkward" places (for example inside a
- * <code>HttpSession</code> or {@link ThreadLocal}).
+ * <p>
+ * A way to refer to objects that are stored in "awkward" places
+ * (for example inside a {@code HttpSession} or {@link ThreadLocal}).
  * <p/>
+ * </p>
  * This interface is typically implemented by someone integrating Pico into an existing container.
+ * </p>
  *
  * @author Joe Walnes
  */
 public interface ObjectReference<T> {
-    /**
-     * Retrieve an actual reference to the object. Returns null if the reference is not available
-     * or has not been populated yet.
-     *
-     * @return an actual reference to the object.
-     */
-    T get();
+  /**
+   * Retrieve an actual reference to the object.
+   * Returns {@code null} if the reference is not available or has not been populated yet.
+   *
+   * @return an actual reference to the object.
+   */
+  @Nullable
+  T get();
 
-    /**
-     * Assign an object to the reference.
-     *
-     * @param item the object to assign to the reference. May be <code>null</code>.
-     */
-    void set(T item);
+  /**
+   * Assign an object to the reference.
+   *
+   * @param item the object to assign to the reference. May be {@code null}.
+   */
+  void set(@Nullable final T item);
 }
