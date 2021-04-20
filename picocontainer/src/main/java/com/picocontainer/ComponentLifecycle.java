@@ -9,40 +9,36 @@
 package com.picocontainer;
 
 /**
- *
- *
+ * TODO
  */
 public interface ComponentLifecycle<T> {
+  /**
+   * Invoke the "start" method on the component.
+   *
+   * @param container the container to "start" the component
+   */
+  void start(final PicoContainer container);
 
-    /**
-     * Invoke the "start" method on the component.
-     *
-     * @param container the container to "start" the component
-     */
-    void start(PicoContainer container);
+  /**
+   * Invoke the "stop" method on the component.
+   *
+   * @param container the container to "stop" the component
+   */
+  void stop(final PicoContainer container);
 
-    /**
-     * Invoke the "stop" method on the component.
-     *
-     * @param container the container to "stop" the component
-     */
-    void stop(PicoContainer container);
+  /**
+   * Invoke the "dispose" method on the component.
+   *
+   * @param container the container to "dispose" the component
+   */
+  void dispose(final PicoContainer container);
 
-    /**
-     * Invoke the "dispose" method on the component.
-     *
-     * @param container the container to "dispose" the component
-     */
-    void dispose(PicoContainer container);
+  /**
+   * Test if a component honors a lifecycle.
+   *
+   * @return {@code true} if the component has a lifecycle
+   */
+  boolean componentHasLifecycle();
 
-    /**
-     * Test if a component honors a lifecycle.
-     *
-     * @return <code>true</code> if the component has a lifecycle
-     */
-    boolean componentHasLifecycle();
-
-    boolean isStarted();
-
-
+  boolean isStarted();
 }
