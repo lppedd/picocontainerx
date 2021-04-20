@@ -1,3 +1,13 @@
+## Fork improvements
+
+- [ ] Clean-up sources
+- [ ] Convert tests from JUnit 4 to JUnit 5
+- [ ] Improve typings
+- [ ] Evaluate the usefulness of JType
+- [ ] Evaluate the state of JSR-330 support
+
+----------
+
 ## Status
 
 PicoContainer 3.x is in Git at Github and Codehaus (mirrors), and is a work in progress.  
