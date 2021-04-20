@@ -9,12 +9,15 @@
  *****************************************************************************/
 package com.picocontainer.monitors;
 
-import static com.picocontainer.monitors.ComponentMonitorHelper.ctorToString;
-import static com.picocontainer.monitors.ComponentMonitorHelper.format;
-import static com.picocontainer.monitors.ComponentMonitorHelper.memberToString;
-import static com.picocontainer.monitors.ComponentMonitorHelper.methodToString;
-import static com.picocontainer.monitors.ComponentMonitorHelper.parmsToString;
-import static org.junit.Assert.assertEquals;
+import com.picocontainer.ComponentMonitor;
+import com.picocontainer.PicoCompositionException;
+import com.picocontainer.PicoContainer;
+import com.picocontainer.PicoLifecycleException;
+import com.picocontainer.adapters.AbstractAdapter;
+import com.picocontainer.containers.TransientPicoContainer;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.StringWriter;
 import java.io.Writer;
@@ -24,18 +27,11 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.picocontainer.ComponentMonitor;
-import com.picocontainer.PicoCompositionException;
-import com.picocontainer.PicoContainer;
-import com.picocontainer.PicoLifecycleException;
-import com.picocontainer.adapters.AbstractAdapter;
-import com.picocontainer.containers.TransientPicoContainer;
-import com.picocontainer.monitors.ComponentMonitorHelper;
-import com.picocontainer.monitors.WriterComponentMonitor;
+import static com.picocontainer.monitors.ComponentMonitorHelper.ctorToString;
+import static com.picocontainer.monitors.ComponentMonitorHelper.format;
+import static com.picocontainer.monitors.ComponentMonitorHelper.memberToString;
+import static com.picocontainer.monitors.ComponentMonitorHelper.methodToString;
+import static com.picocontainer.monitors.ComponentMonitorHelper.parmsToString;
 
 /**
  * @author Aslak Helles&oslash;y
@@ -50,7 +46,7 @@ public class WriterComponentMonitorTestCase  {
     private Constructor constructor;
     private Method method;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         out = new StringWriter();
         constructor = getClass().getConstructor((Class[])null);
@@ -61,7 +57,7 @@ public class WriterComponentMonitorTestCase  {
     @SuppressWarnings("unchecked")
     @Test public void testShouldTraceInstantiating() {
         monitor.instantiating(null, null, constructor);
-        assertEquals(format(ComponentMonitorHelper.INSTANTIATING, ctorToString(constructor)) +NL,  out.toString());
+        Assertions.assertEquals(format(ComponentMonitorHelper.INSTANTIATING, ctorToString(constructor)) +NL,  out.toString());
     }
 
     @SuppressWarnings("unchecked")
@@ -69,35 +65,36 @@ public class WriterComponentMonitorTestCase  {
         Object[] injected = new Object[0];
         Object instantiated = new Object();
         monitor.instantiated(null, null, constructor, instantiated, injected, 543);
-        Assert.assertEquals(format(ComponentMonitorHelper.INSTANTIATED,
+        Assertions.assertEquals(format(ComponentMonitorHelper.INSTANTIATED,
                                                    ctorToString(constructor),
                                                    (long)543,
                                                    instantiated.getClass().getName(), parmsToString(injected)) +NL,  out.toString());
     }
 
     @SuppressWarnings("unchecked")
-    @Test public void testShouldTraceInstantiationFailed() {
+    @Test
+    public void testShouldTraceInstantiationFailed() {
         monitor.instantiationFailed(null, null, constructor, new RuntimeException("doh"));
-        Assert.assertEquals(format(ComponentMonitorHelper.INSTANTIATION_FAILED,
+        Assertions.assertEquals(format(ComponentMonitorHelper.INSTANTIATION_FAILED,
                                                    ctorToString(constructor), "doh") +NL,  out.toString());
     }
 
     @Test public void testShouldTraceInvoking() {
         monitor.invoking(null, null, method, this, new Object[0]);
-        Assert.assertEquals(format(ComponentMonitorHelper.INVOKING,
+        Assertions.assertEquals(format(ComponentMonitorHelper.INVOKING,
                                                    memberToString(method), this) +NL,  out.toString());
     }
 
     @Test public void testShouldTraceInvoked() {
         monitor.invoked(null, null, method, this, 543, null, new Object[0]);
-        Assert.assertEquals(format(ComponentMonitorHelper.INVOKED,
+        Assertions.assertEquals(format(ComponentMonitorHelper.INVOKED,
                                                    methodToString(method), this,
                                                    (long)543) +NL,  out.toString());
     }
 
     @Test public void testShouldTraceInvocatiationFailed() {
         monitor.invocationFailed(method, this, new RuntimeException("doh"));
-        Assert.assertEquals(format(ComponentMonitorHelper.INVOCATION_FAILED,
+        Assertions.assertEquals(format(ComponentMonitorHelper.INVOCATION_FAILED,
         		memberToString(method), this, "doh") +NL,  out.toString());
     }
 
@@ -123,11 +120,11 @@ public class WriterComponentMonitorTestCase  {
                                                        method,
                                                        "fooooo",
                                                        new RuntimeException("doh"));
-            Assert.fail("should have barfed");
+            Assertions.fail("should have barfed");
         } catch (PicoLifecycleException e) {
             //expected
         }
-        Assert.assertEquals(format(ComponentMonitorHelper.LIFECYCLE_INVOCATION_FAILED,
+        Assertions.assertEquals(format(ComponentMonitorHelper.LIFECYCLE_INVOCATION_FAILED,
                                                    methodToString(method), "fooooo", "doh") + NL,
                      out.toString());
     }
@@ -135,7 +132,7 @@ public class WriterComponentMonitorTestCase  {
     @Test public void testNoComponent() {
 
         monitor.noComponentFound(new TransientPicoContainer(), "foo");
-        Assert.assertEquals(format(ComponentMonitorHelper.NO_COMPONENT,
+        Assertions.assertEquals(format(ComponentMonitorHelper.NO_COMPONENT,
                                                    "foo") +NL,  out.toString());
     }
 
