@@ -1,7 +1,9 @@
 package com.picocontainer;
 
+/**
+ * TODO
+ */
+@SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface Decorator {
-
-    Object decorate(Object instance);
-
+  Object decorate(final Object instance);
 }
