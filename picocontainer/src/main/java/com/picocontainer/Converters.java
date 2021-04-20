@@ -16,21 +16,19 @@ import java.lang.reflect.Type;
  * @author Michael Rimov
  */
 public interface Converters {
+  /**
+   * Returns {@code true} if a converter is available to convert to the given object type.
+   *
+   * @param type the object type to convert to
+   */
+  boolean canConvert(final Type type);
 
-    /**
-     * Returns true if a converters is available to convert to the given object type
-     *
-     * @param type the object Type to convert to
-     * @return true if the type can be converted to
-     */
-    boolean canConvert(Type type);
-
-    /**
-     * Converts a particular string value into the target type
-     *
-     * @param value the String value to convert
-     * @param type the object Type to convert to
-     * @return The converted Object instance
-     */
-    Object convert(String value, Type type);
+  /**
+   * Converts a particular string value into the target type.
+   *
+   * @param value the string value to convert
+   * @param type the object type to convert to
+   * @return The converted object instance
+   */
+  Object convert(final String value, final Type type);
 }
