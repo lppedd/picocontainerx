@@ -9,14 +9,8 @@
  *****************************************************************************/
 package com.picocontainer.injectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.Test;
-
-import com.picocontainer.injectors.AbstractInjector;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test the CyclicDependecy.
@@ -93,18 +87,19 @@ public final class ThreadLocalCyclicDependencyGuardTestCase {
         initTest(runner);
 
         for (Runnable aRunner : runner) {
-            assertNull(((ThreadLocalRunner) aRunner).exception);
+            Assertions.assertNull(((ThreadLocalRunner) aRunner).exception);
         }
     }
 
-    @Test public void testCyclicDependencyException() {
+    @Test
+    public void testCyclicDependencyException() {
         final AbstractInjector.CyclicDependencyException cdEx = new AbstractInjector.CyclicDependencyException(getClass());
         cdEx.push(String.class);
         final Class[] classes = cdEx.getDependencies();
-        assertEquals(2, classes.length);
-        assertSame(getClass(), classes[0]);
-        assertSame(String.class, classes[1]);
-        assertTrue(cdEx.getMessage().indexOf(getClass().getName()) >= 0);
+        Assertions.assertEquals(2, classes.length);
+        Assertions.assertSame(getClass(), classes[0]);
+        Assertions.assertSame(String.class, classes[1]);
+        Assertions.assertTrue(cdEx.getMessage().indexOf(getClass().getName()) >= 0);
     }
 
 
