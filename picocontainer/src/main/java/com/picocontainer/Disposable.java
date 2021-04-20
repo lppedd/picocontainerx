@@ -10,18 +10,24 @@
 package com.picocontainer;
 
 /**
- * An interface which is implemented by components that need to dispose of resources during the shutdown of that
- * component. The {@link Disposable#dispose()} must be called once during shutdown, directly after {@link
+ * <p>
+ * An interface which is implemented by components that need to dispose of resources during their shutdown.
+ * </p>
+ * <p>
+ * The {@link Disposable#dispose()} must be called once during shutdown, directly after {@link
  * Startable#stop()} (if the component implements the {@link Startable} interface).
- * @see com.picocontainer.Startable the Startable interface if you need to <code>start()</code> and
- *      <code>stop()</code> semantics.
- * @see com.picocontainer.PicoContainer the main PicoContainer interface (and hence its subinterfaces and
- *      implementations like {@link DefaultPicoContainer}) implement this interface.
+ * </p>
+ *
+ * @see Startable The Startable interface if you need to start() and stop() semantics
+ * @see PicoContainer The main PicoContainer interface (and hence its subinterfaces and
+ * implementations like DefaultPicoContainer) implement this interface
  */
+@SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface Disposable {
-    /**
-     * Dispose this component. The component should deallocate all resources. The contract for this method defines a
-     * single call at the end of this component's life.
-     */
-    void dispose();
+  /**
+   * Dispose this component.
+   * The component should deallocate all resources.
+   * The contract for this method defines a single call at the end of this component's life.
+   */
+  void dispose();
 }
