@@ -1,24 +1,19 @@
 package com.picocontainer.containers;
 
-import static com.picocontainer.Key.annotatedKey;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import com.picocontainer.MutablePicoContainer;
+import com.picocontainer.annotations.Bind;
+import com.picocontainer.injectors.AbstractInjector;
+import com.picocontainer.testmodel.DependsOnTouchable;
+import com.picocontainer.testmodel.SimpleTouchable;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.junit.Test;
-import com.picocontainer.testmodel.DependsOnTouchable;
-import com.picocontainer.testmodel.SimpleTouchable;
-
-import com.picocontainer.MutablePicoContainer;
-import com.picocontainer.annotations.Bind;
-import com.picocontainer.containers.TieringPicoContainer;
-import com.picocontainer.injectors.AbstractInjector;
+import static com.picocontainer.Key.annotatedKey;
 
 public class TieringPicoContainerTestCase {
 
@@ -44,7 +39,7 @@ public class TieringPicoContainerTestCase {
         TiredPerson tp = null;
         try {
             tp = child.getComponent(TiredPerson.class);
-            fail("should have barfed");
+            Assertions.fail("should have barfed");
         } catch (AbstractInjector.UnsatisfiableDependenciesException e) {
             // expected
         }
@@ -59,8 +54,8 @@ public class TieringPicoContainerTestCase {
         child.addComponent(TiredPerson.class);
 
         TiredPerson tp = child.getComponent(TiredPerson.class);
-        assertNotNull(tp);
-        assertNotNull(tp.couchToSitOn);
+        Assertions.assertNotNull(tp);
+        Assertions.assertNotNull(tp.couchToSitOn);
 
     }
 
@@ -92,12 +87,12 @@ public class TieringPicoContainerTestCase {
         c.addComponent(Doctor.class);
         c.addComponent(TiredDoctor.class);
         Doctor d = c.getComponent(Doctor.class);
-        assertNotNull(d);
-        assertNotNull(d.tiredPerson);
-        assertNotNull(d.tiredPerson.couchToSitOn);
+        Assertions.assertNotNull(d);
+        Assertions.assertNotNull(d.tiredPerson);
+        Assertions.assertNotNull(d.tiredPerson.couchToSitOn);
         try {
             TiredDoctor td = c.getComponent(TiredDoctor.class);
-            fail("should have barfed");
+            Assertions.fail("should have barfed");
         } catch (AbstractInjector.UnsatisfiableDependenciesException e) {
             // expected
         }
@@ -144,13 +139,13 @@ public class TieringPicoContainerTestCase {
         grandparent.addComponent(annotatedKey(TiredPerson.class, Grouchy.class), GrouchyTiredPerson.class);
         child.addComponent(DiscerningDoctor.class);
 
-        assertNotNull(grandparent.getComponent(TiredPerson.class, Polite.class));
-        assertNotNull(grandparent.getComponent(TiredPerson.class, Grouchy.class));
+        Assertions.assertNotNull(grandparent.getComponent(TiredPerson.class, Polite.class));
+        Assertions.assertNotNull(grandparent.getComponent(TiredPerson.class, Grouchy.class));
 
         DiscerningDoctor dd = null;
         try {
             dd = child.getComponent(DiscerningDoctor.class);
-            fail("should have barfed");
+            Assertions.fail("should have barfed");
         } catch (AbstractInjector.UnsatisfiableDependenciesException e) {
             // expected
         }
@@ -165,12 +160,12 @@ public class TieringPicoContainerTestCase {
         grandparent.addComponent(annotatedKey(TiredPerson.class, Grouchy.class), GrouchyTiredPerson.class);
         grandparent.addComponent(DiscerningDoctor.class);
 
-        assertNotNull(grandparent.getComponent(TiredPerson.class, Polite.class));
-        assertNotNull(grandparent.getComponent(TiredPerson.class, Grouchy.class));
+        Assertions.assertNotNull(grandparent.getComponent(TiredPerson.class, Polite.class));
+        Assertions.assertNotNull(grandparent.getComponent(TiredPerson.class, Grouchy.class));
 
         DiscerningDoctor dd = grandparent.getComponent(DiscerningDoctor.class);
-        assertNotNull(dd.tiredPerson);
-        assertTrue(dd.tiredPerson instanceof PoliteTiredPerson);
+        Assertions.assertNotNull(dd.tiredPerson);
+        Assertions.assertTrue(dd.tiredPerson instanceof PoliteTiredPerson);
 
     }
 
@@ -181,7 +176,7 @@ public class TieringPicoContainerTestCase {
         child.setName("child");
 		parent.addComponent("st", SimpleTouchable.class);
 		child.addComponent("dot", DependsOnTouchable.class);
-		assertEquals("child:1<[Immutable]:parent:1<|", child.toString());
+		Assertions.assertEquals("child:1<[Immutable]:parent:1<|", child.toString());
     }
 
 
