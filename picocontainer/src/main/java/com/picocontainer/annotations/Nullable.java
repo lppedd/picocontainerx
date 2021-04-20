@@ -14,7 +14,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * TODO
+ */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value={ElementType.PARAMETER})
-public @interface Nullable {
-}
+@Target(ElementType.PARAMETER)
+public @interface Nullable {}
