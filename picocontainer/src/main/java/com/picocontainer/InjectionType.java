@@ -9,5 +9,8 @@
  *****************************************************************************/
 package com.picocontainer;
 
-public interface InjectionType extends ComponentFactory {
-}
+/**
+ * TODO
+ */
+@SuppressWarnings("MarkerInterface")
+public interface InjectionType extends ComponentFactory {}
