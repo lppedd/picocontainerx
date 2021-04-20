@@ -9,16 +9,6 @@
  *****************************************************************************/
 package com.picocontainer.defaults;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Test;
-
 import com.picocontainer.Characteristics;
 import com.picocontainer.DefaultPicoContainer;
 import com.picocontainer.MutablePicoContainer;
@@ -26,6 +16,12 @@ import com.picocontainer.PicoCompositionException;
 import com.picocontainer.PicoContainer;
 import com.picocontainer.adapters.AbstractAdapter;
 import com.picocontainer.injectors.ConstructorInjection;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class can be used to test out various things asked on the mailing list.
@@ -86,7 +82,8 @@ public final class UserQuestionTestCase {
         }
     }
 
-    @Test public void testOmeletteCanHaveDifferentCheeseWithAFunnyComponentAdapter() {
+    @Test
+    public void testOmeletteCanHaveDifferentCheeseWithAFunnyComponentAdapter() {
         Map<String,Cheese> cheeseMap = new HashMap<String,Cheese>();
 
         MutablePicoContainer pico = new DefaultPicoContainer(new ConstructorInjection());
@@ -96,12 +93,12 @@ public final class UserQuestionTestCase {
         Cheese gouda = new Gouda();
         cheeseMap.put("cheese", gouda);
         Omelette goudaOmelette = pico.getComponent(Omelette.class);
-        assertSame(gouda, goudaOmelette.getCheese());
+        Assertions.assertSame(gouda, goudaOmelette.getCheese());
 
         Cheese roquefort = new Roquefort();
         cheeseMap.put("cheese", roquefort);
         Omelette roquefortOmelette = pico.getComponent(Omelette.class);
-        assertSame(roquefort, roquefortOmelette.getCheese());
+        Assertions.assertSame(roquefort, roquefortOmelette.getCheese());
     }
 
     public static interface InterfaceX {
@@ -164,9 +161,9 @@ public final class UserQuestionTestCase {
         pico.addComponent(NeedsInterfaceX.class);
 
         NeedsInterfaceX needsInterfaceX = pico.getComponent(NeedsInterfaceX.class);
-        assertEquals("Disabled", needsInterfaceX.getIt());
+        Assertions.assertEquals("Disabled", needsInterfaceX.getIt());
         map.put("enabled", "blah");
-        assertEquals("Enabled", needsInterfaceX.getIt());
+        Assertions.assertEquals("Enabled", needsInterfaceX.getIt());
     }
 
     // From John Tal 23/03/2004
@@ -186,13 +183,14 @@ public final class UserQuestionTestCase {
         }
     }
 
-    @Test public void testJohnTalOne() {
+    @Test
+    public void testJohnTalOne() {
         MutablePicoContainer picoContainer = new DefaultPicoContainer();
 
         picoContainer.addComponent("ABC", ABCImpl.class);
         picoContainer.addComponent("DEF", DEFImpl.class);
 
-        assertEquals(ABCImpl.class, picoContainer.getComponent("ABC").getClass());
+        Assertions.assertEquals(ABCImpl.class, picoContainer.getComponent("ABC").getClass());
     }
 
     public static interface Foo {
@@ -228,17 +226,19 @@ public final class UserQuestionTestCase {
         }
     }
 
-    @Test public void testShouldBeAbleShareSameReferenceForDifferentTypes() {
+    @Test
+    public void testShouldBeAbleShareSameReferenceForDifferentTypes() {
         MutablePicoContainer pico = new DefaultPicoContainer();
         pico.as(Characteristics.CACHE).addComponent(FooBar.class);
         pico.addComponent(NeedsFoo.class);
         pico.addComponent(NeedsBar.class);
         NeedsFoo needsFoo = pico.getComponent(NeedsFoo.class);
         NeedsBar needsBar = pico.getComponent(NeedsBar.class);
-        assertSame(needsFoo.getFoo(), needsBar.getBar());
+        Assertions.assertSame(needsFoo.getFoo(), needsBar.getBar());
     }
 
-    @Test public void testSeveralDifferentInstancesCanBeCreatedWithOnePreconfiguredContainer() {
+    @Test
+    public void testSeveralDifferentInstancesCanBeCreatedWithOnePreconfiguredContainer() {
         // create a container that doesn't cache instances
         MutablePicoContainer container = new DefaultPicoContainer(new ConstructorInjection());
         container.addComponent(NeedsBar.class);
@@ -246,15 +246,15 @@ public final class UserQuestionTestCase {
         Bar barOne = new FooBar();
         container.addComponent(Bar.class, barOne);
         NeedsBar needsBarOne = container.getComponent(NeedsBar.class);
-        assertSame(barOne, needsBarOne.getBar());
+        Assertions.assertSame(barOne, needsBarOne.getBar());
 
         // reuse the same container - just flip out the existing foo.
         Bar barTwo = new FooBar();
         container.removeComponent(Bar.class);
         container.addComponent(Bar.class, barTwo);
         NeedsBar needsBarTwo = container.getComponent(NeedsBar.class);
-        assertSame(barTwo, needsBarTwo.getBar());
+        Assertions.assertSame(barTwo, needsBarTwo.getBar());
 
-        assertNotSame(needsBarOne, needsBarTwo);
+        Assertions.assertNotSame(needsBarOne, needsBarTwo);
     }
 }
