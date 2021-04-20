@@ -16,59 +16,56 @@ package com.picocontainer;
  * @author J&ouml;rg Schaible
  */
 public interface PicoVisitor {
+  /**
+   * Constant that indicates that the traversal should continue after the
+   * {@code visit*()} method has been called.
+   */
+  boolean CONTINUE_TRAVERSAL = true;
 
+  /**
+   * Constant that indicates that the traversal should abort after the
+   * {@code visit*()} method has been called.
+   */
+  boolean ABORT_TRAVERSAL = false;
 
-	/**
-	 * Constant that indicates that the traversal should continue after the
-	 * visit*() method has been called.
-	 */
-	boolean CONTINUE_TRAVERSAL = true;
+  /**
+   * Entry point for the {@code PicoVisitor} traversal.
+   * The given node is the first object that is asked for acceptance.
+   * Only objects of type {@link PicoContainer}, {@link ComponentAdapter}, or {@link Parameter} are valid.
+   *
+   * @param node the start node of the traversal.
+   * @return a visitor-specific value.
+   */
+  Object traverse(final Object node);
 
-	/**
-	 * Constant that indicates that the traversal should abort after the
-	 * visit*() method has been called.
-	 */
-	boolean ABORT_TRAVERSAL = false;
+  /**
+   * Visit a {@link PicoContainer} that has to accept the visitor.
+   *
+   * @param pico the visited container.
+   * @return CONTINUE_TRAVERSAL if the traversal should continue.
+   * Any visitor callback that returns ABORT_TRAVERSAL indicates
+   * the desire to abort any further traversal.
+   */
+  boolean visitContainer(final PicoContainer pico);
 
-    /**
-     * Entry point for the PicoVisitor traversal. The given node is the first object, that is
-     * asked for acceptance. Only objects of type {@link PicoContainer}, {@link ComponentAdapter},
-     * or {@link Parameter} are valid.
-     *
-     * @param node the start node of the traversal.
-     * @return a visitor-specific value.
-     * @throws IllegalArgumentException in case of an argument of invalid type.
-     */
-    Object traverse(Object node);
+  /**
+   * Visit a {@link ComponentAdapter} that has to accept the visitor.
+   *
+   * @param componentAdapter the visited ComponentAdapter.
+   */
+  void visitComponentAdapter(final ComponentAdapter<?> componentAdapter);
 
-    /**
-     * Visit a {@link PicoContainer} that has to accept the visitor.
-     *
-     * @param pico the visited container.
-     * @return CONTINUE_TRAVERSAL if the traversal should continue.
-     * Any visitor callback that returns ABORT_TRAVERSAL indicates
-     * the desire to abort any further traversal.
-     */
-    boolean visitContainer(PicoContainer pico);
+  /**
+   * Visit a {@link ComponentAdapter} that has to accept the visitor.
+   *
+   * @param componentFactory the visited ComponentFactory.
+   */
+  void visitComponentFactory(final ComponentFactory componentFactory);
 
-    /**
-     * Visit a {@link ComponentAdapter} that has to accept the visitor.
-     *
-     * @param componentAdapter the visited ComponentAdapter.
-     */
-    void visitComponentAdapter(ComponentAdapter<?> componentAdapter);
-
-    /**
-     * Visit a {@link ComponentAdapter} that has to accept the visitor.
-     *
-     * @param componentAdapter the visited ComponentAdapter.
-     */
-    void visitComponentFactory(ComponentFactory componentFactory);
-
-    /**
-     * Visit a {@link Parameter} that has to accept the visitor.
-     *
-     * @param parameter the visited Parameter.
-     */
-    void visitParameter(Parameter parameter);
+  /**
+   * Visit a {@link Parameter} that has to accept the visitor.
+   *
+   * @param parameter the visited Parameter.
+   */
+  void visitParameter(final Parameter parameter);
 }
