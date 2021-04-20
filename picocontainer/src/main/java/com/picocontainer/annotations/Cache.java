@@ -14,7 +14,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * TODO
+ */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value={ ElementType.TYPE })
-public @interface Cache {
-}
+@Target(ElementType.TYPE)
+public @interface Cache {}
