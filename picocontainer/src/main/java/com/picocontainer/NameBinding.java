@@ -9,34 +9,38 @@
  *****************************************************************************/
 package com.picocontainer;
 
+import org.jetbrains.annotations.Nullable;
+
+/**
+ * TODO
+ */
+@SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface NameBinding {
-    String getName();
+  String getName();
 
-    /**
-     * <em>Special Case</em> of name binding that represents a null NameBinding argument.
-     */
-    NameBinding NULL = new NameBinding() {
+  /**
+   * Special case of name binding that represents a null {@code NameBinding} argument.
+   */
+  NameBinding NULL = new NameBinding() {
+    @Nullable
+    @Override
+    public String getName() {
+      return null;
+    }
 
- 		public String getName() {
-			return null;
-		}
+    @Override
+    public int hashCode() {
+      return 42;
+    }
 
-		@Override
-		public int hashCode() {
-			return 42;
-		}
+    @Override
+    public boolean equals(final Object obj) {
+      return this == obj;
+    }
 
-		@Override
-		public boolean equals(final Object obj) {
-			return this == obj;
-		}
-
-		@Override
-		public String toString() {
-			return "Null Name Binding";
-		}
-
-
-    };
-
+    @Override
+    public String toString() {
+      return "Null NameBinding";
+    }
+  };
 }
