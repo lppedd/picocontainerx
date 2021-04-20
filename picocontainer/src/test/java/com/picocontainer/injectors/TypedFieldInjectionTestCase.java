@@ -9,19 +9,15 @@
  *****************************************************************************/
 package com.picocontainer.injectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import com.picocontainer.ComponentAdapter;
+import com.picocontainer.lifecycle.NullLifecycleStrategy;
+import com.picocontainer.monitors.ConsoleComponentMonitor;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import org.junit.Test;
-
-import com.picocontainer.ComponentAdapter;
-import com.picocontainer.injectors.TypedFieldInjection;
-import com.picocontainer.lifecycle.NullLifecycleStrategy;
-import com.picocontainer.monitors.ConsoleComponentMonitor;
 
 public class TypedFieldInjectionTestCase {
     private static final String FIELD_TYPES = Integer.class.getName() + " " + PogoStick.class.getName() + " " + Float.class.getName();
@@ -44,20 +40,21 @@ public class TypedFieldInjectionTestCase {
         ComponentAdapter ca = injectionFactory.createComponentAdapter(cm, new NullLifecycleStrategy(),
                 props, Map.class, HashMap.class, null, null, null);
 
-        assertTrue(ca instanceof TypedFieldInjection.TypedFieldInjector);
+        Assertions.assertTrue(ca instanceof TypedFieldInjection.TypedFieldInjector);
 
         TypedFieldInjection.TypedFieldInjector tfi = (TypedFieldInjection.TypedFieldInjector) ca;
 
-        assertEquals(3, tfi.getInjectionFieldTypes().size());
-        assertEquals(Integer.class.getName(), tfi.getInjectionFieldTypes().get(0));
-        assertEquals(PogoStick.class.getName(), tfi.getInjectionFieldTypes().get(1));
-        assertEquals(Float.class.getName(), tfi.getInjectionFieldTypes().get(2));
+        Assertions.assertEquals(3, tfi.getInjectionFieldTypes().size());
+        Assertions.assertEquals(Integer.class.getName(), tfi.getInjectionFieldTypes().get(0));
+        Assertions.assertEquals(PogoStick.class.getName(), tfi.getInjectionFieldTypes().get(1));
+        Assertions.assertEquals(Float.class.getName(), tfi.getInjectionFieldTypes().get(2));
     }
 
-    @Test public void testPropertiesAreRight() {
+    @Test
+    public void testPropertiesAreRight() {
         Properties props = TypedFieldInjection.injectionFieldTypes(FIELD_TYPES);
-        assertEquals("java.lang.Integer com.picocontainer.injectors.TypedFieldInjectionTestCase$PogoStick java.lang.Float", props.getProperty("injectionFieldTypes"));
-        assertEquals(1, props.size());
+        Assertions.assertEquals("java.lang.Integer com.picocontainer.injectors.TypedFieldInjectionTestCase$PogoStick java.lang.Float", props.getProperty("injectionFieldTypes"));
+        Assertions.assertEquals(1, props.size());
     }
 
 
