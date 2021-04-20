@@ -14,8 +14,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * TODO
+ */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value={ElementType.METHOD, ElementType.FIELD})
-public @interface Inject {
-    //Marker annotation only, no attributes.
-}
+@Target({ElementType.METHOD, ElementType.FIELD})
+public @interface Inject {}
