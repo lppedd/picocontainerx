@@ -1,17 +1,5 @@
 package com.picocontainer.adapters;
 
-import static com.picocontainer.Key.annotatedKey;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.picocontainer.DefaultPicoContainer;
 import com.picocontainer.MutablePicoContainer;
 import com.picocontainer.annotations.Bind;
@@ -21,6 +9,15 @@ import com.picocontainer.injectors.AnnotatedFieldInjection;
 import com.picocontainer.injectors.ConstructorInjection;
 import com.picocontainer.injectors.MethodInjection;
 import com.picocontainer.injectors.SetterInjection;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import static com.picocontainer.Key.annotatedKey;
 
 /** @author Paul Hammant */
 public class TypedBindingAnnotationTestCase  {
@@ -37,11 +34,11 @@ public class TypedBindingAnnotationTestCase  {
     private void assertGettingOfAppleOneWorks(final MutablePicoContainer mpc) {
         try {
             mpc.getComponent(Apple.class);
-            Assert.fail("should have barfed");
+            Assertions.fail("should have barfed");
         } catch (AbstractInjector.AmbiguousComponentResolutionException e) {
             // expected
         }
-        assertNotNull(mpc.getComponent(Apple.class, Bramley.class));
+        Assertions.assertNotNull(mpc.getComponent(Apple.class, Bramley.class));
     }
 
     @Test public void testBindingAnnotationsWithConstructorInjection() {
@@ -54,11 +51,11 @@ public class TypedBindingAnnotationTestCase  {
     }
 
     private void assertFourMemberApplesAreRight(final FruitBasket fb) {
-        assertNotNull(fb);
-        assertEquals(fb.bramley.getX(), 1);
-        assertEquals(fb.cox.getX(), 2);
-        assertEquals(fb.granny.getX(), 3);
-        assertEquals(fb.braeburn.getX(), 4);
+        Assertions.assertNotNull(fb);
+        Assertions.assertEquals(fb.bramley.getX(), 1);
+        Assertions.assertEquals(fb.cox.getX(), 2);
+        Assertions.assertEquals(fb.granny.getX(), 3);
+        Assertions.assertEquals(fb.braeburn.getX(), 4);
     }
 
     @Test public void testBindingAnnotationsWithMethodInjection() {
@@ -70,7 +67,8 @@ public class TypedBindingAnnotationTestCase  {
 
     }
 
-    @Test public void testBindingAnnotationsWithSetterInjection() {
+    @Test
+    public void testBindingAnnotationsWithSetterInjection() {
         MutablePicoContainer mpc = new DefaultPicoContainer(new SetterInjection());
         addFiveComponents(mpc);
         FruitBasket fb = mpc.getComponent(FruitBasket.class);
