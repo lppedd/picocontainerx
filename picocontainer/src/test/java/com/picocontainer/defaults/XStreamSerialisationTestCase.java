@@ -9,18 +9,16 @@
  *****************************************************************************/
 package com.picocontainer.defaults;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-import com.picocontainer.testmodel.DependsOnTouchable;
-import com.picocontainer.testmodel.SimpleTouchable;
-
 import com.picocontainer.DefaultPicoContainer;
 import com.picocontainer.MutablePicoContainer;
 import com.picocontainer.PicoContainer;
+import com.picocontainer.testmodel.DependsOnTouchable;
+import com.picocontainer.testmodel.SimpleTouchable;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.core.JVM;
 import com.thoughtworks.xstream.io.xml.XppDriver;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Aslak Helles&oslash;y
@@ -28,17 +26,19 @@ import com.thoughtworks.xstream.io.xml.XppDriver;
 public final class XStreamSerialisationTestCase {
     private final XStream xStream = new XStream(new XppDriver());
 
-    @Test public void testShouldBeAbleToSerialiseEmptyPico() {
+    @Test
+    public void testShouldBeAbleToSerialiseEmptyPico() {
         if (JVM.is14()) {
             MutablePicoContainer pico = new DefaultPicoContainer();
             String picoXml = xStream.toXML(pico);
             PicoContainer serializedPico = (PicoContainer) xStream.fromXML(picoXml);
 
-            assertEquals(0, serializedPico.getComponents().size());
+            Assertions.assertEquals(0, serializedPico.getComponents().size());
         }
     }
 
-    @Test public void testShouldBeAbleToSerialisePicoWithUninstantiatedComponents() {
+    @Test
+    public void testShouldBeAbleToSerialisePicoWithUninstantiatedComponents() {
         if (JVM.is14()) {
             MutablePicoContainer pico = new DefaultPicoContainer();
             pico.addComponent(SimpleTouchable.class);
@@ -46,11 +46,12 @@ public final class XStreamSerialisationTestCase {
             String picoXml = xStream.toXML(pico);
             PicoContainer serializedPico = (PicoContainer) xStream.fromXML(picoXml);
 
-            assertEquals(2, serializedPico.getComponents().size());
+            Assertions.assertEquals(2, serializedPico.getComponents().size());
         }
     }
 
-    @Test public void testShouldBeAbleToSerialisePicoWithInstantiatedComponents() {
+    @Test
+    public void testShouldBeAbleToSerialisePicoWithInstantiatedComponents() {
         if (JVM.is14()) {
             MutablePicoContainer pico = new DefaultPicoContainer();
             pico.addComponent(SimpleTouchable.class);
@@ -59,7 +60,7 @@ public final class XStreamSerialisationTestCase {
             String picoXml = xStream.toXML(pico);
             PicoContainer serializedPico = (PicoContainer) xStream.fromXML(picoXml);
 
-            assertEquals(2, serializedPico.getComponents().size());
+            Assertions.assertEquals(2, serializedPico.getComponents().size());
         }
     }
 }
