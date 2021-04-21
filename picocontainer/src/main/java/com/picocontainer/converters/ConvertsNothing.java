@@ -1,18 +1,22 @@
 package com.picocontainer.converters;
 
 import com.picocontainer.Converters;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 
 /**
- * Null-object implementation of Converters
+ * Does nothing.
  */
 public class ConvertsNothing implements Converters {
-    public boolean canConvert(final Type type) {
-        return false;
-    }
+  @Override
+  public boolean canConvert(final Type type) {
+    return false;
+  }
 
-    public Object convert(final String paramValue, final Type type) {
-        return null;
-    }
+  @Nullable
+  @Override
+  public Object convert(final String paramValue, final Type type) {
+    return null;
+  }
 }
