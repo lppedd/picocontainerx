@@ -7,7 +7,10 @@
  ******************************************************************************/
 package com.picocontainer.parameters;
 
-import com.picocontainer.*;
+import com.picocontainer.ComponentAdapter;
+import com.picocontainer.NameBinding;
+import com.picocontainer.PicoContainer;
+import com.picocontainer.PicoVisitor;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -16,63 +19,65 @@ import java.lang.reflect.Type;
 
 /**
  * Part of the replacement construct for Parameter.ZERO
+ *
  * @since PicoContainer 2.8
  */
 @SuppressWarnings("serial")
-public final class DefaultConstructorParameter extends AbstractParameter implements Parameter, Serializable {
+public final class DefaultConstructorParameter extends AbstractParameter implements Serializable {
+  public static final DefaultConstructorParameter INSTANCE = new DefaultConstructorParameter();
 
-	/**
-	 * The one and only instance
-	 */
-	public static final DefaultConstructorParameter INSTANCE = new DefaultConstructorParameter();
+  @Override
+  public void accept(final PicoVisitor visitor) {
+    visitor.visitParameter(this);
+  }
 
-	/**
-	 * No instantiation
-	 */
-	public void accept(final PicoVisitor visitor) {
-		visitor.visitParameter(this);
-	}
+  @Override
+  public Resolver resolve(
+      final PicoContainer container,
+      final ComponentAdapter<?> forAdapter,
+      final ComponentAdapter<?> injecteeAdapter,
+      final Type expectedType,
+      final NameBinding expectedNameBinding,
+      final boolean useNames,
+      final Annotation binding) {
+    return new NotResolved();
+  }
 
-	public Resolver resolve(final PicoContainer container,
-                            final ComponentAdapter<?> forAdapter, final ComponentAdapter<?> injecteeAdapter, final Type expectedType,
-                            final NameBinding expectedNameBinding, final boolean useNames,
-                            final Annotation binding) {
-		return new Parameter.NotResolved();
-	}
+  @Override
+  public void verify(
+      final PicoContainer container,
+      final ComponentAdapter<?> adapter,
+      final Type expectedType,
+      final NameBinding expectedNameBinding,
+      final boolean useNames,
+      final Annotation binding) {
+    if (!(expectedType instanceof Class)) {
+      throw new ClassCastException("Unable to use except for class types.  Offending type: " + expectedType);
+    }
 
-	public void verify(final PicoContainer container,
-			final ComponentAdapter<?> adapter, final Type expectedType,
-			final NameBinding expectedNameBinding, final boolean useNames,
-			final Annotation binding) {
+    final Class<?> type = (Class<?>) expectedType;
 
-		if (!(expectedType instanceof Class)) {
-			throw new ClassCastException("Unable to use except for class types.  Offending type: " + expectedType);
-		}
+    try {
+      final Constructor<?> constructor = type.getConstructor();
+    } catch (final NoSuchMethodException e) {
+      throw new IllegalArgumentException("No default constructor for type " + expectedType, e);
+    }
+  }
 
-		Class<?> type = (Class<?>)expectedType;
-		try {
-			Constructor constructor = type.getConstructor();
-		} catch (NoSuchMethodException e) {
-			throw new IllegalArgumentException("No default constructor for type " + expectedType,e);
-		}
-	}
+  @Override
+  public String toString() {
+    return "Force Default Constructor Parameter";
+  }
 
-    @Override
-	public String toString() {
-		return "Force Default Constructor Parameter";
-	}
+  /**
+   * Returns {@code true} if the object is a DEFAULT_CONSTRUCTOR object.
+   */
+  @Override
+  public boolean equals(final Object other) {
+    if (other == null) {
+      return false;
+    }
 
-	/**
-	 * Returns true if the object object is a DEFAULT_CONSTRUCTOR object.
-	 * {@inheritDoc}
-	 * @see Object#equals(Object)
-	 */
-	@Override
-	public boolean equals(final Object other) {
-		if (other == null) {
-			return false;
-		}
-
-		return (other.getClass().getName()).equals(getClass().getName());
-	}
+    return other.getClass().getName().equals(getClass().getName());
+  }
 }
