@@ -15,46 +15,47 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ClassPathElement denotes an element in a classpath allowing to grant permissions.
+ * Denotes an element in a classpath allowing to grant permissions.
  *
  * @author Paul Hammant
  */
 @SuppressWarnings("serial")
 public class ClassPathElement implements Serializable {
+  private final URL url;
+  private Permissions permissionCollection;
+  private final List<Permission> permissions = new ArrayList<>();
 
-    private final URL url;
-    private Permissions permissionCollection;
-    private final List<Permission> permissions = new ArrayList<Permission>();
+  public ClassPathElement(final URL url) {
+    this.url = url;
+  }
 
-    public ClassPathElement(final URL url) {
-        this.url = url;
+  public Permission grantPermission(final Permission permission) {
+    if (permission == null) {
+      throw new NullPointerException();
     }
 
-    public Permission grantPermission(final Permission permission) {
-        if (permission == null) {
-            throw new NullPointerException();
-        }
-        permissions.add(permission);
-        return permission;
+    permissions.add(permission);
+    return permission;
+  }
+
+  public URL getUrl() {
+    return url;
+  }
+
+  public Permissions getPermissionCollection() {
+    if (permissionCollection == null) {
+      permissionCollection = new Permissions();
+
+      for (final Permission permission : permissions) {
+        permissionCollection.add(permission);
+      }
     }
 
-    public URL getUrl() {
-        return url;
-    }
+    return permissionCollection;
+  }
 
-    public Permissions getPermissionCollection() {
-        if (permissionCollection == null) {
-            permissionCollection = new Permissions();
-            for (Permission permission : permissions) {
-                permissionCollection.add(permission);
-            }
-        }
-        return permissionCollection;
-    }
-
-    @Override
-	public String toString() {
-        return "[" + System.identityHashCode(this) + " " + url + " " + permissions.size() +"]";
-    }
-
+  @Override
+  public String toString() {
+    return "[" + System.identityHashCode(this) + " " + url + " " + permissions.size() + "]";
+  }
 }
