@@ -20,91 +20,99 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Java EE 5 has some annotations PreDestroy and PostConstruct that map to start() and dispose() in our world
+ * Java EE 5 has some annotations {@link PreDestroy} and {@link PostConstruct}
+ * that map to start() and dispose() in our world.
  *
  * @author Paul Hammant
  */
 @SuppressWarnings("serial")
 public final class JavaEE5LifecycleStrategy extends AbstractMonitoringLifecycleStrategy {
+  /**
+   * @param monitor the monitor to use
+   * @throws NullPointerException if the monitor is {@code null}
+   */
+  public JavaEE5LifecycleStrategy(final ComponentMonitor monitor) {
+    super(monitor);
+  }
 
-    /**
-     * Construct a JavaEE5LifecycleStrategy.
-     *
-     * @param monitor the monitor to use
-     * @throws NullPointerException if the monitor is <code>null</code>
-     */
-    public JavaEE5LifecycleStrategy(final ComponentMonitor monitor) {
-        super(monitor);
+  @Override
+  public void start(final Object component) {
+    doLifecycleMethod(component, PostConstruct.class, true);
+  }
+
+  @Override
+  public void stop(final Object component) {}
+
+  @Override
+  public void dispose(final Object component) {
+    doLifecycleMethod(component, PreDestroy.class, false);
+  }
+
+  private void doLifecycleMethod(
+      final Object component,
+      final Class<? extends Annotation> annotation,
+      final boolean superFirst) {
+    doLifecycleMethod(component, annotation, component.getClass(), superFirst, new HashSet<>());
+  }
+
+  private void doLifecycleMethod(
+      final Object component,
+      final Class<? extends Annotation> annotation,
+      final Class<?> clazz,
+      final boolean superFirst,
+      final Set<? super String> doneAlready) {
+    final Class<?> parent = clazz.getSuperclass();
+
+    if (superFirst && parent != Object.class) {
+      doLifecycleMethod(component, annotation, parent, superFirst, doneAlready);
     }
 
-    /** {@inheritDoc} **/
-    public void start(final Object component) {
-        doLifecycleMethod(component, PostConstruct.class, true);
-    }
+    final Method[] methods = clazz.getDeclaredMethods();
 
-	/** {@inheritDoc} **/
-    public void stop(final Object component) {
-    }
+    for (final Method method : methods) {
+      final String signature = signature(method);
 
-    /** {@inheritDoc} **/
-    public void dispose(final Object component) {
-        doLifecycleMethod(component, PreDestroy.class, false);
-    }
-
-    private void doLifecycleMethod(final Object component, final Class<? extends Annotation> annotation, final boolean superFirst) {
-    	doLifecycleMethod(component, annotation, component.getClass(), superFirst, new HashSet<String>());
-    }
-
-    private void doLifecycleMethod(final Object component, final Class<? extends Annotation> annotation, final Class<? extends Object> clazz, final boolean superFirst, final Set<String> doneAlready) {
-        Class<?> parent = clazz.getSuperclass();
-        if (superFirst && parent != Object.class) {
-            doLifecycleMethod(component, annotation, parent, superFirst, doneAlready);
+      if (method.isAnnotationPresent(annotation) && !doneAlready.contains(signature)) {
+        try {
+          final long str = System.currentTimeMillis();
+          currentMonitor().invoking(null, null, method, component);
+          AnnotationInjectionUtils.setMemberAccessible(method);
+          method.invoke(component);
+          doneAlready.add(signature);
+          currentMonitor().invoked(null, null, method, component, System.currentTimeMillis() - str, null);
+        } catch (final IllegalAccessException | InvocationTargetException e) {
+          throw new PicoLifecycleException(method, component, e);
         }
-
-        Method[] methods = clazz.getDeclaredMethods();
-        for (Method method : methods) {
-            String signature = signature(method);
-
-            if (method.isAnnotationPresent(annotation) && !doneAlready.contains(signature)) {
-                try {
-                    long str = System.currentTimeMillis();
-                    currentMonitor().invoking(null, null, method, component, new Object[0]);
-                    AnnotationInjectionUtils.setMemberAccessible(method);
-                    method.invoke(component);
-                    doneAlready.add(signature);
-                    currentMonitor().invoked(null, null, method, component, System.currentTimeMillis() - str, null, new Object[0]);
-                } catch (IllegalAccessException e) {
-                    throw new PicoLifecycleException(method, component, e);
-                } catch (InvocationTargetException e) {
-                    throw new PicoLifecycleException(method, component, e);
-                }
-            }
-        }
-
-        if (!superFirst && parent != Object.class) {
-            doLifecycleMethod(component, annotation, parent, superFirst, doneAlready);
-        }
+      }
     }
 
-    private static String signature(final Method method) {
-        StringBuilder sb = new StringBuilder(method.getName());
-        Class<?>[] pt = method.getParameterTypes();
-        for (Class<?> objectClass : pt) {
-            sb.append(objectClass.getName());
-        }
-        return sb.toString();
+    if (!superFirst && parent != Object.class) {
+      // noinspection ConstantConditions
+      doLifecycleMethod(component, annotation, parent, superFirst, doneAlready);
     }
-    /**
-     * {@inheritDoc} The component has a lifecycle PreDestroy or PostConstruct are on a method
-     */
-    public boolean hasLifecycle(final Class<?> type) {
-        Method[] methods = type.getDeclaredMethods();
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(PreDestroy.class) || method.isAnnotationPresent(PostConstruct.class)) {
-                return true;
-            }
-        }
-        return false;
+  }
+
+  private static String signature(final Method method) {
+    final StringBuilder sb = new StringBuilder(method.getName());
+    final Class<?>[] pt = method.getParameterTypes();
+
+    for (final Class<?> objectClass : pt) {
+      sb.append(objectClass.getName());
     }
 
+    return sb.toString();
+  }
+
+  @Override
+  public boolean hasLifecycle(final Class<?> type) {
+    final Method[] methods = type.getDeclaredMethods();
+
+    for (final Method method : methods) {
+      if (method.isAnnotationPresent(PreDestroy.class) || method.isAnnotationPresent(PostConstruct.class)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
 }
