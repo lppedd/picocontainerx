@@ -8,8 +8,11 @@
 package com.picocontainer.composers;
 
 import com.picocontainer.ComponentAdapter;
+import com.picocontainer.ComponentAdapter.NOTHING;
 import com.picocontainer.PicoContainer;
-import com.picocontainer.monitors.ComposingMonitor;
+import com.picocontainer.monitors.ComposingMonitor.Composer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,43 +23,43 @@ import java.util.regex.Pattern;
 /**
  * Subsets components in a container, the keys for which match a regular expression.
  */
-public class RegexComposer implements ComposingMonitor.Composer {
+public class RegexComposer implements Composer {
+  private final Pattern pattern;
+  private final String forNamedComponent;
 
-    private final Pattern pattern;
-    private final String forNamedComponent;
+  public RegexComposer(@NotNull final String pattern, final String forNamedComponent) {
+    this.pattern = Pattern.compile(pattern);
+    this.forNamedComponent = forNamedComponent;
+  }
 
-    public RegexComposer(final String pattern, final String forNamedComponent) {
-        this.pattern = Pattern.compile(pattern);
-        this.forNamedComponent = forNamedComponent;
-    }
+  public RegexComposer() {
+    pattern = null;
+    forNamedComponent = null;
+  }
 
-    public RegexComposer() {
-        pattern = null;
-        forNamedComponent = null;
-    }
+  @Nullable
+  @Override
+  public Object compose(final PicoContainer container, final Object key) {
+    if (key instanceof String && (forNamedComponent == null || forNamedComponent.equals(key))) {
+      final Pattern pat = pattern == null ? Pattern.compile((String) key) : pattern;
+      final Collection<ComponentAdapter<?>> cas = container.getComponentAdapters();
+      final Collection<Object> retVal = new ArrayList<>();
 
-    public Object compose(final PicoContainer container, final Object key) {
-        if (key instanceof String
-                && (forNamedComponent == null || forNamedComponent.equals(key))) {
-            Pattern pat = null;
-            if (pattern == null) {
-                pat = Pattern.compile((String) key);
-            } else {
-                pat = pattern;
-            }
-            Collection<ComponentAdapter<?>> cas = container.getComponentAdapters();
-            List retVal = new ArrayList();
-            for (ComponentAdapter<?> componentAdapter : cas) {
-                Object key2 = componentAdapter.getComponentKey();
-                if (key2 instanceof String) {
-                    Matcher matcher = pat.matcher((String) key2);
-                    if (matcher != null && matcher.find()) {
-                        retVal.add(componentAdapter.getComponentInstance(container, ComponentAdapter.NOTHING.class));
-                    }
-                }
-            }
-            return retVal;
+      for (final ComponentAdapter<?> componentAdapter : cas) {
+        final Object key2 = componentAdapter.getComponentKey();
+
+        if (key2 instanceof String) {
+          final Matcher matcher = pat.matcher((String) key2);
+
+          if (matcher.find()) {
+            retVal.add(componentAdapter.getComponentInstance(container, NOTHING.class));
+          }
         }
-        return null;
+      }
+
+      return retVal;
     }
+
+    return null;
+  }
 }
