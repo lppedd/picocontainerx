@@ -13,20 +13,21 @@ import com.picocontainer.Parameter;
 import com.picocontainer.PicoContainer;
 
 /**
- * Concrete implementation of Visitor which simply checks traversals.
- * This can be a useful class for other Visitor implementations to extend,
- * as it provides a default implementation in case you one is only interested
- * in one PicoVisitor type.  Example:
+ * Concrete implementation of visitor which simply checks traversals.
+ * This can be a useful class for other visitor implementations to extend,
+ * as it provides a default implementation in case your one is only interested
+ * in one {@link com.picocontainer.PicoVisitor} type.<br>
+ * Example:
  *
- *<pre>
+ * <pre>
  * PicoContainer container = new DefaultPicoContainer();
  * PicoContainer child = container.makeChildContainer();
  *
- * final List allContainers = new ArrayList();
+ * List allContainers = new ArrayList();
  *
  * PicoVisitor visitor = new TraversalCheckingVisitor() {
  *     public boolean visitContainer(PicoContainer pico) {
- *         super.visitContainer(pico);  //Calls checkTraversal for us.
+ *         super.visitContainer(pico);  // Calls checkTraversal for us
  *         allContainers.add(pico);
  *         return true;
  *     }
@@ -35,28 +36,25 @@ import com.picocontainer.PicoContainer;
  *
  * @author Michael Rimov
  */
-public class TraversalCheckingVisitor
-        extends AbstractPicoVisitor {
+public class TraversalCheckingVisitor extends AbstractPicoVisitor {
+  @Override
+  public boolean visitContainer(final PicoContainer pico) {
+    checkTraversal();
+    return CONTINUE_TRAVERSAL;
+  }
 
-	/** {@inheritDoc} **/
-    public boolean visitContainer(final PicoContainer pico) {
-        checkTraversal();
-        return CONTINUE_TRAVERSAL;
-    }
+  @Override
+  public void visitComponentAdapter(final ComponentAdapter<?> componentAdapter) {
+    checkTraversal();
+  }
 
-	/** {@inheritDoc} **/
-    public void visitComponentAdapter(final ComponentAdapter<?> componentAdapter) {
-        checkTraversal();
-    }
+  @Override
+  public void visitComponentFactory(final ComponentFactory componentFactory) {
+    checkTraversal();
+  }
 
-	/** {@inheritDoc} **/
-    public void visitComponentFactory(final ComponentFactory componentFactory) {
-        checkTraversal();
-    }
-
-	/** {@inheritDoc} **/
-    public void visitParameter(final Parameter parameter) {
-        checkTraversal();
-    }
-
+  @Override
+  public void visitParameter(final Parameter parameter) {
+    checkTraversal();
+  }
 }
