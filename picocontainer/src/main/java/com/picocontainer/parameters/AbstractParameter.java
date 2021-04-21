@@ -9,20 +9,18 @@
 package com.picocontainer.parameters;
 
 import com.picocontainer.Parameter;
+import org.jetbrains.annotations.Nullable;
 
+/**
+ * TODO
+ */
 public abstract class AbstractParameter implements Parameter {
-
-	public AbstractParameter() {
-
-	}
-
-	/**
-	 * @todo REMOVE ME
-	 *
-	 * @return
-	 */
-	public String getTargetName() {
-		return null;
-	}
-
+  /**
+   * TODO: remove me
+   */
+  @Nullable
+  @Override
+  public String getTargetName() {
+    return null;
+  }
 }
