@@ -10,7 +10,15 @@
 package com.picocontainer.containers;
 
 import com.googlecode.jtype.Generic;
-import com.picocontainer.*;
+import com.picocontainer.ComponentAdapter;
+import com.picocontainer.ComponentAdapter.NOTHING;
+import com.picocontainer.Converters;
+import com.picocontainer.Converting;
+import com.picocontainer.NameBinding;
+import com.picocontainer.PicoContainer;
+import com.picocontainer.PicoVisitor;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -20,179 +28,253 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * CompositePicoContainer takes a var-args list of containers and will query them
- * in turn for getComponent(*) and getComponentAdapter(*) requests.  Methods returning
- * lists and getParent/accept will not function.
+ * Takes a var-args list of containers and will query them in turn for
+ * getComponent(*) and getComponentAdapter(*) requests.
+ * Methods returning lists and getParent/accept will not function.
  */
+@SuppressWarnings("serial")
 public class CompositePicoContainer implements PicoContainer, Converting, Serializable {
+  private final PicoContainer[] containers;
+  private final Converters compositeConverter = new CompositeConverters();
 
-    private final PicoContainer[] containers;
-    private final Converters compositeConverter = new CompositeConverters();
-
-    public class CompositeConverters implements Converters {
-        public boolean canConvert(final Type type) {
-            for (PicoContainer container : containers) {
-                if (container instanceof Converting && ((Converting) container).getConverters().canConvert(type)) {
-                    return true;
-                }
-            }
-            return false;
+  public class CompositeConverters implements Converters {
+    @Override
+    public boolean canConvert(final Type type) {
+      for (final PicoContainer container : containers) {
+        if (container instanceof Converting && ((Converting) container).getConverters().canConvert(type)) {
+          return true;
         }
+      }
 
-        public Object convert(final String paramValue, final Type type) {
-            for (PicoContainer container : containers) {
-                if (container instanceof Converting) {
-                    Converters converter = ((Converting) container).getConverters();
-                    if (converter.canConvert(type)) {
-                        return converter.convert(paramValue, type);
-                    }
-                }
-            }
-            return null;
+      return false;
+    }
+
+    @Nullable
+    @Override
+    public Object convert(final String paramValue, final Type type) {
+      for (final PicoContainer container : containers) {
+        if (container instanceof Converting) {
+          final Converters converter = ((Converting) container).getConverters();
+          if (converter.canConvert(type)) {
+            return converter.convert(paramValue, type);
+          }
         }
+      }
+
+      return null;
+    }
+  }
+
+  public CompositePicoContainer(final PicoContainer... containers) {
+    this.containers = containers;
+  }
+
+  @Nullable
+  @Override
+  public <T> T getComponentInto(final Class<T> componentType, final Type into) {
+    for (final PicoContainer container : containers) {
+      final T inst = container.getComponentInto(componentType, into);
+
+      if (inst != null) {
+        return inst;
+      }
     }
 
-    public CompositePicoContainer(final PicoContainer... containers) {
-        this.containers = containers;
+    return null;
+  }
+
+  @Nullable
+  @Override
+  public <T> T getComponentInto(final Generic<T> componentType, final Type into) {
+    for (final PicoContainer container : containers) {
+      final T inst = container.getComponentInto(componentType, into);
+
+      if (inst != null) {
+        return inst;
+      }
     }
 
-    public <T> T getComponentInto(final Class<T> componentType, final Type into) {
-        for (PicoContainer container : containers) {
-            T inst = container.getComponentInto(componentType, into);
-            if (inst != null) {
-                return inst;
-            }
-        }
-        return null;
+    return null;
+  }
+
+  @Nullable
+  @Override
+  public Object getComponent(final Object keyOrType) {
+    return getComponentInto(keyOrType, NOTHING.class);
+  }
+
+  @Nullable
+  @Override
+  public Object getComponentInto(final Object keyOrType, final Type into) {
+    for (final PicoContainer container : containers) {
+      final Object inst = container.getComponentInto(keyOrType, into);
+
+      if (inst != null) {
+        return inst;
+      }
     }
 
-    public <T> T getComponentInto(final Generic<T> componentType, final Type into) {
-        for (PicoContainer container : containers) {
-            T inst = container.getComponentInto(componentType, into);
-            if (inst != null) {
-                return inst;
-            }
-        }
-        return null;
+    return null;
+  }
+
+  @Nullable
+  @Override
+  public <T> T getComponent(final Class<T> componentType) {
+    return getComponent(Generic.get(componentType));
+  }
+
+  @Nullable
+  @Override
+  public <T> T getComponent(final Generic<T> componentType) {
+    for (final PicoContainer container : containers) {
+      final T inst = container.getComponent(componentType);
+
+      if (inst != null) {
+        return inst;
+      }
     }
 
-    public Object getComponent(final Object keyOrType) {
-        return getComponentInto(keyOrType, ComponentAdapter.NOTHING.class);
+    return null;
+  }
+
+  @Nullable
+  @Override
+  public ComponentAdapter<?> getComponentAdapter(final Object key) {
+    for (final PicoContainer container : containers) {
+      final ComponentAdapter<?> inst = container.getComponentAdapter(key);
+
+      if (inst != null) {
+        return inst;
+      }
     }
 
-    public Object getComponentInto(final Object keyOrType, final Type into) {
-        for (PicoContainer container : containers) {
-            Object inst = container.getComponentInto(keyOrType, into);
-            if (inst != null) {
-                return inst;
-            }
-        }
-        return null;
+    return null;
+  }
+
+  @Nullable
+  @Override
+  public <T> ComponentAdapter<T> getComponentAdapter(
+      final Class<T> componentType,
+      final NameBinding nameBinding) {
+    for (final PicoContainer container : containers) {
+      final ComponentAdapter<T> inst = container.getComponentAdapter(Generic.get(componentType), nameBinding);
+
+      if (inst != null) {
+        return inst;
+      }
     }
 
-    public <T> T getComponent(final Class<T> componentType) {
-        return getComponent(Generic.get(componentType));
+    return null;
+  }
+
+  @Nullable
+  @Override
+  public <T> ComponentAdapter<T> getComponentAdapter(
+      final Generic<T> componentType,
+      final NameBinding nameBinding) {
+    for (final PicoContainer container : containers) {
+      final ComponentAdapter<T> inst = container.getComponentAdapter(componentType, nameBinding);
+
+      if (inst != null) {
+        return inst;
+      }
     }
 
+    return null;
+  }
 
-    public <T> T getComponent(final Generic<T> componentType) {
-        for (PicoContainer container : containers) {
-            Object inst = container.getComponent(componentType);
-            if (inst != null) {
-                return (T) inst;
-            }
-        }
-        return null;
+  @Nullable
+  @Override
+  public <T> ComponentAdapter<T> getComponentAdapter(
+      final Class<T> componentType,
+      final Class<? extends Annotation> binding) {
+    return getComponentAdapter(Generic.get(componentType), binding);
+  }
+
+  @Nullable
+  @Override
+  public <T> ComponentAdapter<T> getComponentAdapter(
+      final Generic<T> componentType,
+      final Class<? extends Annotation> binding) {
+    for (final PicoContainer container : containers) {
+      final ComponentAdapter<T> inst = container.getComponentAdapter(componentType, binding);
+
+      if (inst != null) {
+        return inst;
+      }
     }
 
-    public ComponentAdapter getComponentAdapter(final Object key) {
-        for (PicoContainer container : containers) {
-            ComponentAdapter inst = container.getComponentAdapter(key);
-            if (inst != null) {
-                return inst;
-            }
-        }
-        return null;
-    }
+    return null;
+  }
 
-    public <T> ComponentAdapter<T> getComponentAdapter(final Class<T> componentType, final NameBinding nameBinding) {
-        for (PicoContainer container : containers) {
-            ComponentAdapter<T> inst = container.getComponentAdapter(Generic.get(componentType), nameBinding);
-            if (inst != null) {
-                return inst;
-            }
-        }
-        return null;
-    }
+  @Nullable
+  @Contract("_, _, _ -> null")
+  @Override
+  public <T> T getComponent(
+      final Class<T> componentType,
+      final Class<? extends Annotation> binding,
+      final Type into) {
+    return null;
+  }
 
-    public <T> ComponentAdapter<T> getComponentAdapter(final Generic<T> componentType, final NameBinding nameBinding) {
-        for (PicoContainer container : containers) {
-            ComponentAdapter<T> inst = container.getComponentAdapter(componentType, nameBinding);
-            if (inst != null) {
-                return inst;
-            }
-        }
-        return null;
-    }
+  @Nullable
+  @Contract("_, _, -> null")
+  @Override
+  public <T> T getComponent(final Class<T> componentType, final Class<? extends Annotation> binding) {
+    return null;
+  }
 
-    public <T> ComponentAdapter<T> getComponentAdapter(final Class<T> componentType, final Class<? extends Annotation> binding) {
-        return getComponentAdapter(Generic.get(componentType), binding);
-    }
+  @Override
+  public List<Object> getComponents() {
+    return Collections.emptyList();
+  }
 
-    public <T> ComponentAdapter<T> getComponentAdapter(final Generic<T> componentType, final Class<? extends Annotation> binding) {
-        for (PicoContainer container : containers) {
-            ComponentAdapter<T> inst = container.getComponentAdapter(componentType, binding);
-            if (inst != null) {
-                return inst;
-            }
-        }
-        return null;
-    }
+  @Nullable
+  @Contract("-> null")
+  @Override
+  public PicoContainer getParent() {
+    return null;
+  }
 
-    public <T> T getComponent(final Class<T> componentType, final Class<? extends Annotation> binding, final Type into) {
-        return null;
-    }
+  @Override
+  public Collection<ComponentAdapter<?>> getComponentAdapters() {
+    return Collections.emptyList();
+  }
 
-    public <T> T getComponent(final Class<T> componentType, final Class<? extends Annotation> binding) {
-        return null;
-    }
+  @Override
+  public <T> List<ComponentAdapter<T>> getComponentAdapters(final Class<T> componentType) {
+    return Collections.emptyList();
+  }
 
-    public List<Object> getComponents() {
-        return Collections.emptyList();
-    }
+  @Override
+  public <T> List<ComponentAdapter<T>> getComponentAdapters(final Generic<T> componentType) {
+    return Collections.emptyList();
+  }
 
-    public PicoContainer getParent() {
-        return null;
-    }
+  @Override
+  public <T> List<ComponentAdapter<T>> getComponentAdapters(
+      final Class<T> componentType,
+      final Class<? extends Annotation> binding) {
+    return Collections.emptyList();
+  }
 
-    public Collection<ComponentAdapter<?>> getComponentAdapters() {
-        return Collections.emptyList();
-    }
+  @Override
+  public <T> List<ComponentAdapter<T>> getComponentAdapters(
+      final Generic<T> componentType,
+      final Class<? extends Annotation> binding) {
+    return Collections.emptyList();
+  }
 
-    public <T> List<ComponentAdapter<T>> getComponentAdapters(final Class<T> componentType) {
-        return Collections.emptyList();
-    }
+  @Override
+  public <T> List<T> getComponents(final Class<T> componentType) {
+    return Collections.emptyList();
+  }
 
-    public <T> List<ComponentAdapter<T>> getComponentAdapters(final Generic<T> componentType) {
-        return Collections.emptyList();
-    }
+  @Override
+  public void accept(final PicoVisitor visitor) {}
 
-    public <T> List<ComponentAdapter<T>> getComponentAdapters(final Class<T> componentType, final Class<? extends Annotation> binding) {
-        return Collections.emptyList();
-    }
-
-    public <T> List<ComponentAdapter<T>> getComponentAdapters(final Generic<T> componentType, final Class<? extends Annotation> binding) {
-        return Collections.emptyList();
-    }
-
-    public <T> List<T> getComponents(final Class<T> componentType) {
-        return Collections.emptyList();
-    }
-
-    public void accept(final PicoVisitor visitor) {
-    }
-
-    public Converters getConverters() {
-        return compositeConverter;
-    }
+  @Override
+  public Converters getConverters() {
+    return compositeConverter;
+  }
 }
