@@ -17,18 +17,35 @@ import com.picocontainer.injectors.ConstructorInjection;
 import com.picocontainer.lifecycle.NullLifecycleStrategy;
 import com.picocontainer.monitors.NullComponentMonitor;
 
+/**
+ * TODO
+ */
 @SuppressWarnings("serial")
 public class TransientPicoContainer extends DefaultPicoContainer {
+  public TransientPicoContainer() {
+    super(
+        null,
+        new NullLifecycleStrategy(),
+        new NullComponentMonitor(),
+        new Caching().wrap(new ConstructorInjection())
+    );
+  }
 
-    public TransientPicoContainer() {
-        super(null, new NullLifecycleStrategy(), new NullComponentMonitor(), new Caching().wrap(new ConstructorInjection()));
-    }
+  public TransientPicoContainer(final PicoContainer parent) {
+    super(
+        parent,
+        new NullLifecycleStrategy(),
+        new NullComponentMonitor(),
+        new Caching().wrap(new ConstructorInjection())
+    );
+  }
 
-    public TransientPicoContainer(final PicoContainer parent) {
-        super(parent, new NullLifecycleStrategy(), new NullComponentMonitor(), new Caching().wrap(new ConstructorInjection()));
-    }
-
-    public TransientPicoContainer(final ComponentFactory componentFactory, final PicoContainer parent) {
-        super(parent, new NullLifecycleStrategy(), new NullComponentMonitor(), componentFactory);
-    }
+  public TransientPicoContainer(final ComponentFactory componentFactory, final PicoContainer parent) {
+    super(
+        parent,
+        new NullLifecycleStrategy(),
+        new NullComponentMonitor(),
+        componentFactory
+    );
+  }
 }
