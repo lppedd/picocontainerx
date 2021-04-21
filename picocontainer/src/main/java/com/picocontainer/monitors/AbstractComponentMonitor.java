@@ -10,7 +10,15 @@
 
 package com.picocontainer.monitors;
 
-import com.picocontainer.*;
+import com.picocontainer.ChangedBehavior;
+import com.picocontainer.ComponentAdapter;
+import com.picocontainer.ComponentMonitor;
+import com.picocontainer.ComponentMonitorStrategy;
+import com.picocontainer.Injector;
+import com.picocontainer.MutablePicoContainer;
+import com.picocontainer.PicoContainer;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
@@ -19,132 +27,149 @@ import java.lang.reflect.Method;
 
 /**
  * <p>
- * A {@link ComponentMonitor monitor} which delegates to another monitor.
- * It provides a {@link NullComponentMonitor default ComponentMonitor},
- * but does not allow to use <code>null</code> for the delegate.
+ * A {@link ComponentMonitor} which delegates to another monitor.
+ * It provides a {@link NullComponentMonitor} as default,
+ * but does not allow using {@code null} for the delegate.
  * </p>
  * <p>
- * It also supports a {@link com.picocontainer.ComponentMonitorStrategy monitor strategy}
- * that allows to change the delegate.
+ * It also supports a {@link ComponentMonitorStrategy} that allows to change the delegate.
  * </p>
  *
  * @author Mauro Talevi
  */
 @SuppressWarnings("serial")
 public class AbstractComponentMonitor implements ComponentMonitor, ComponentMonitorStrategy, Serializable {
+  /**
+   * Delegate monitor to allow for component monitor chaining.
+   */
+  private ComponentMonitor delegate;
 
+  /**
+   * @param delegate the {@link ComponentMonitor} to which this monitor delegates
+   */
+  public AbstractComponentMonitor(final ComponentMonitor delegate) {
+    checkMonitor(delegate);
+    this.delegate = delegate;
+  }
 
-	/**
-	 * Delegate monitor to allow for component monitor chaining.
-	 */
-	private  ComponentMonitor delegate;
+  /**
+   * Uses {@link NullComponentMonitor} as delegate.
+   */
+  public AbstractComponentMonitor() {
+    this(new NullComponentMonitor());
+  }
 
-    /**
-     * Creates a AbstractComponentMonitor with a given delegate
-     * @param delegate the ComponentMonitor to which this monitor delegates
-     */
-    public AbstractComponentMonitor(final ComponentMonitor delegate) {
-        checkMonitor(delegate);
-        this.delegate = delegate;
+  @Override
+  public <T> Constructor<T> instantiating(
+      final PicoContainer container,
+      final ComponentAdapter<T> componentAdapter,
+      final Constructor<T> constructor) {
+    return delegate.instantiating(container, componentAdapter, constructor);
+  }
+
+  @Override
+  public <T> void instantiated(
+      final PicoContainer container,
+      final ComponentAdapter<T> componentAdapter,
+      final Constructor<T> constructor,
+      final Object instantiated,
+      final Object[] injected,
+      final long duration) {
+    delegate.instantiated(container, componentAdapter, constructor, instantiated, injected, duration);
+  }
+
+  @Override
+  public <T> void instantiationFailed(
+      final PicoContainer container,
+      final ComponentAdapter<T> componentAdapter,
+      final Constructor<T> constructor,
+      final Exception e) {
+    delegate.instantiationFailed(container, componentAdapter, constructor, e);
+  }
+
+  @Override
+  public Object invoking(
+      final PicoContainer container,
+      final ComponentAdapter<?> componentAdapter,
+      final Member member,
+      final Object instance,
+      final Object... args) {
+    return delegate.invoking(container, componentAdapter, member, instance, args);
+  }
+
+  @Override
+  public void invoked(
+      final PicoContainer container,
+      final ComponentAdapter<?> componentAdapter,
+      final Member member,
+      final Object instance,
+      final long duration,
+      final Object retVal,
+      final Object[] args) {
+    delegate.invoked(container, componentAdapter, member, instance, duration, retVal, args);
+  }
+
+  @Override
+  public void invocationFailed(final Member member, final Object instance, final Exception e) {
+    delegate.invocationFailed(member, instance, e);
+  }
+
+  @Override
+  public void lifecycleInvocationFailed(
+      final MutablePicoContainer container,
+      final ComponentAdapter<?> componentAdapter,
+      final Method method,
+      final Object instance,
+      final RuntimeException cause) {
+    delegate.lifecycleInvocationFailed(container, componentAdapter, method, instance, cause);
+  }
+
+  @Override
+  public Object noComponentFound(final MutablePicoContainer container, final Object key) {
+    return delegate.noComponentFound(container, key);
+  }
+
+  @Override
+  public <T> Injector<T> newInjector(final Injector<T> injector) {
+    return injector;
+  }
+
+  @Override
+  public <T> ChangedBehavior<T> changedBehavior(final ChangedBehavior<T> changedBehavior) {
+    return changedBehavior;
+  }
+
+  /**
+   * If the delegate supports a {@link ComponentMonitorStrategy}, this is used to changed
+   * the monitor while keeping the same delegate. Else the delegate is replaced by the new monitor.
+   */
+  @Override
+  public ComponentMonitor changeMonitor(final ComponentMonitor monitor) {
+    checkMonitor(monitor);
+
+    if (delegate instanceof ComponentMonitorStrategy) {
+      return ((ComponentMonitorStrategy) delegate).changeMonitor(monitor);
     }
 
-    /**
-     * Creates a AbstractComponentMonitor with an instance of
-     * {@link NullComponentMonitor}.
-     */
-    public AbstractComponentMonitor() {
-        this(new NullComponentMonitor());
+    final ComponentMonitor result = delegate;
+    delegate = monitor;
+    return result;
+  }
+
+  @Override
+  public ComponentMonitor currentMonitor() {
+    // noinspection SimplifiableIfStatement
+    if (delegate instanceof ComponentMonitorStrategy) {
+      return ((ComponentMonitorStrategy) delegate).currentMonitor();
     }
 
-    public <T> Constructor<T> instantiating(final PicoContainer container, final ComponentAdapter<T> componentAdapter,
-                                     final Constructor<T> constructor) {
-        return delegate.instantiating(container, componentAdapter, constructor);
-    }
+    return delegate;
+  }
 
-    public <T> void instantiated(final PicoContainer container, final ComponentAdapter<T> componentAdapter,
-                             final Constructor<T> constructor,
-                             final Object instantiated,
-                             final Object[] injected,
-                             final long duration) {
-        delegate.instantiated(container, componentAdapter, constructor, instantiated, injected, duration);
+  @Contract("null -> fail")
+  private void checkMonitor(@Nullable final ComponentMonitor monitor) {
+    if (monitor == null) {
+      throw new NullPointerException("monitor");
     }
-
-    public <T> void instantiationFailed(final PicoContainer container,
-                                    final ComponentAdapter<T> componentAdapter,
-                                    final Constructor<T> constructor,
-                                    final Exception e) {
-        delegate.instantiationFailed(container, componentAdapter, constructor, e);
-    }
-
-    public Object invoking(final PicoContainer container,
-                           final ComponentAdapter<?> componentAdapter,
-                           final Member member,
-                           final Object instance, final Object... args) {
-        return delegate.invoking(container, componentAdapter, member, instance, args);
-    }
-
-    public void invoked(final PicoContainer container,
-                        final ComponentAdapter<?> componentAdapter,
-                        final Member member,
-                        final Object instance,
-                        final long duration, final Object retVal, final Object[] args) {
-        delegate.invoked(container, componentAdapter, member, instance, duration, retVal, args);
-    }
-
-    public void invocationFailed(final Member member, final Object instance, final Exception e) {
-        delegate.invocationFailed(member, instance, e);
-    }
-
-    public void lifecycleInvocationFailed(final MutablePicoContainer container,
-                                          final ComponentAdapter<?> componentAdapter, final Method method,
-                                          final Object instance,
-                                          final RuntimeException cause) {
-        delegate.lifecycleInvocationFailed(container, componentAdapter, method,instance, cause);
-    }
-
-    public Object noComponentFound(final MutablePicoContainer container, final Object key) {
-        return delegate.noComponentFound(container, key);
-    }
-
-    public Injector newInjector(final Injector injector) {
-        return injector;
-    }
-
-    public ChangedBehavior changedBehavior(final ChangedBehavior changedBehavior) {
-        return changedBehavior;
-    }
-
-    /**
-     * If the delegate supports a {@link ComponentMonitorStrategy monitor strategy},
-     * this is used to changed the monitor while keeping the same delegate.
-     * Else the delegate is replaced by the new monitor.
-     * {@inheritDoc}
-     */
-    public ComponentMonitor changeMonitor(final ComponentMonitor monitor) {
-    	ComponentMonitor result;
-        checkMonitor(monitor);
-        if (delegate instanceof ComponentMonitorStrategy) {
-        	result = ((ComponentMonitorStrategy)delegate).changeMonitor(monitor);
-        } else {
-        	result = delegate;
-            delegate = monitor;
-        }
-        
-        return result;
-    }
-
-    public ComponentMonitor currentMonitor() {
-        if (delegate instanceof ComponentMonitorStrategy) {
-            return ((ComponentMonitorStrategy)delegate).currentMonitor();
-        } else {
-            return delegate;
-        }
-    }
-
-    private void checkMonitor(final ComponentMonitor monitor) {
-        if (monitor == null) {
-            throw new NullPointerException("monitor");
-        }
-    }
-
+  }
 }
