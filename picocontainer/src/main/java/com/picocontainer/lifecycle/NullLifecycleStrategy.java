@@ -15,34 +15,26 @@ import com.picocontainer.LifecycleStrategy;
 import java.io.Serializable;
 
 /**
- * Lifecycle strategy that does nothing.
- *
+ * {@link LifecycleStrategy} that does nothing.
  */
 @SuppressWarnings("serial")
 public class NullLifecycleStrategy implements LifecycleStrategy, Serializable {
+  @Override
+  public void start(final Object component) { }
 
+  @Override
+  public void stop(final Object component) { }
 
-    /** {@inheritDoc} **/
-	public void start(final Object component) {
-		//Does nothing
-    }
+  @Override
+  public void dispose(final Object component) { }
 
-    /** {@inheritDoc} **/
-    public void stop(final Object component) {
-		//Does nothing
-    }
+  @Override
+  public boolean hasLifecycle(final Class<?> type) {
+    return false;
+  }
 
-    /** {@inheritDoc} **/
-    public void dispose(final Object component) {
-		//Does nothing
-    }
-
-    /** {@inheritDoc} **/
-    public boolean hasLifecycle(final Class<?> type) {
-        return false;
-    }
-
-    public boolean isLazy(final ComponentAdapter<?> adapter) {
-        return false;
-    }
+  @Override
+  public boolean isLazy(final ComponentAdapter<?> adapter) {
+    return false;
+  }
 }
