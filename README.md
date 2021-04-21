@@ -1,6 +1,7 @@
 ## Fork improvements
 
 - [ ] Clean-up sources
+- [ ] Port missing fixes from PicoContainer 2.x
 - [ ] Convert tests from JUnit 4 to JUnit 5
 - [ ] Improve typings
 - [ ] Evaluate the usefulness of JType
