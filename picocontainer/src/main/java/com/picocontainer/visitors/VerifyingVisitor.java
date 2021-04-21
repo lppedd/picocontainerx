@@ -7,7 +7,13 @@
  *****************************************************************************/
 package com.picocontainer.visitors;
 
-import com.picocontainer.*;
+import com.picocontainer.ComponentAdapter;
+import com.picocontainer.ComponentFactory;
+import com.picocontainer.Parameter;
+import com.picocontainer.PicoContainer;
+import com.picocontainer.PicoVerificationException;
+import com.picocontainer.PicoVisitor;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,110 +21,113 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Visitor to verify {@link PicoContainer} instances. The visitor walks down the logical container hierarchy.
+ * Visitor to verify {@link PicoContainer} instances.
+ * The visitor walks down the logical container hierarchy.
  *
  * @author J&ouml;rg Schaible
  */
 public class VerifyingVisitor extends TraversalCheckingVisitor {
+  private final List<RuntimeException> nestedVerificationExceptions;
+  private final Set<ComponentAdapter<?>> verifiedComponentAdapters;
+  private final Set<ComponentFactory> verifiedComponentFactories;
+  private final PicoVisitor componentAdapterCollector;
+  private PicoContainer currentPico;
 
-    private final List<RuntimeException> nestedVerificationExceptions;
-    private final Set<ComponentAdapter> verifiedComponentAdapters;
-    private final Set<ComponentFactory> verifiedComponentFactories;
-    private final PicoVisitor componentAdapterCollector;
-    private PicoContainer currentPico;
+  /**
+   * Construct a VerifyingVisitor.
+   */
+  public VerifyingVisitor() {
+    nestedVerificationExceptions = new ArrayList<>();
+    verifiedComponentAdapters = new HashSet<>();
+    verifiedComponentFactories = new HashSet<>();
+    componentAdapterCollector = new ComponentAdapterCollector();
+  }
 
-    /**
-     * Construct a VerifyingVisitor.
-     */
-    public VerifyingVisitor() {
-        nestedVerificationExceptions = new ArrayList<RuntimeException>();
-        verifiedComponentAdapters = new HashSet<ComponentAdapter>();
-        verifiedComponentFactories = new HashSet<ComponentFactory>();
-        componentAdapterCollector = new ComponentAdapterCollector();
+  /**
+   * Traverse through all components of the {@link PicoContainer} hierarchy and verify the components.
+   *
+   * @throws PicoVerificationException if some components could not be verified.
+   * @see PicoVisitor#traverse(Object)
+   */
+  @Override
+  public Object traverse(final Object node) {
+    nestedVerificationExceptions.clear();
+    verifiedComponentAdapters.clear();
+
+    try {
+      super.traverse(node);
+
+      if (!nestedVerificationExceptions.isEmpty()) {
+        throw new PicoVerificationException(new ArrayList<>(nestedVerificationExceptions));
+      }
+    } finally {
+      nestedVerificationExceptions.clear();
+      verifiedComponentAdapters.clear();
     }
 
-    /**
-     * Traverse through all components of the {@link PicoContainer} hierarchy and verify the components.
-     *
-     * @throws PicoVerificationException if some components could not be verified.
-     * @see com.picocontainer.PicoVisitor#traverse(Object)
-     */
+    return Void.TYPE;
+  }
+
+  @Override
+  public boolean visitContainer(final PicoContainer container) {
+    super.visitContainer(container);
+    currentPico = container;
+    return CONTINUE_TRAVERSAL;
+  }
+
+  @Override
+  public void visitComponentAdapter(final ComponentAdapter<?> componentAdapter) {
+    super.visitComponentAdapter(componentAdapter);
+
+    if (!verifiedComponentAdapters.contains(componentAdapter)) {
+      try {
+        componentAdapter.verify(currentPico);
+      } catch (final RuntimeException e) {
+        nestedVerificationExceptions.add(e);
+      }
+
+      componentAdapter.accept(componentAdapterCollector);
+    }
+  }
+
+  @Override
+  public void visitComponentFactory(final ComponentFactory componentFactory) {
+    super.visitComponentFactory(componentFactory);
+
+    if (!verifiedComponentFactories.contains(componentFactory)) {
+      try {
+        componentFactory.verify(currentPico);
+      } catch (final RuntimeException e) {
+        nestedVerificationExceptions.add(e);
+      }
+
+      componentFactory.accept(componentAdapterCollector);
+    }
+  }
+
+  private class ComponentAdapterCollector implements PicoVisitor {
     @Override
-	public Object traverse(final Object node) throws PicoVerificationException {
-        nestedVerificationExceptions.clear();
-        verifiedComponentAdapters.clear();
-        try {
-            super.traverse(node);
-            if (!nestedVerificationExceptions.isEmpty()) {
-                throw new PicoVerificationException(new ArrayList<RuntimeException>(nestedVerificationExceptions));
-            }
-        } finally {
-            nestedVerificationExceptions.clear();
-            verifiedComponentAdapters.clear();
-        }
-        return Void.TYPE;
+    @Nullable
+    public Object traverse(final Object node) {
+      return null;
     }
 
     @Override
-	public boolean visitContainer(final PicoContainer pico) {
-        super.visitContainer(pico);
-        currentPico = pico;
-        return CONTINUE_TRAVERSAL;
+    public boolean visitContainer(final PicoContainer pico) {
+      return CONTINUE_TRAVERSAL;
     }
 
     @Override
-	public void visitComponentAdapter(final ComponentAdapter<?> componentAdapter) {
-        super.visitComponentAdapter(componentAdapter);
-        if (!verifiedComponentAdapters.contains(componentAdapter)) {
-            try {
-                componentAdapter.verify(currentPico);
-            } catch (RuntimeException e) {
-                nestedVerificationExceptions.add(e);
-            }
-            componentAdapter.accept(componentAdapterCollector);
-        }
-
+    public void visitComponentAdapter(final ComponentAdapter<?> componentAdapter) {
+      verifiedComponentAdapters.add(componentAdapter);
     }
 
     @Override
-	public void visitComponentFactory(final ComponentFactory componentFactory) {
-        super.visitComponentFactory(componentFactory);
-
-        if (!verifiedComponentFactories.contains(componentFactory)) {
-            try {
-                componentFactory.verify(currentPico);
-            } catch (RuntimeException e) {
-                nestedVerificationExceptions.add(e);
-            }
-            componentFactory.accept(componentAdapterCollector);
-        }
-
+    public void visitComponentFactory(final ComponentFactory componentFactory) {
+      verifiedComponentFactories.add(componentFactory);
     }
 
-
-
-    private class ComponentAdapterCollector implements PicoVisitor {
-        // /CLOVER:OFF
-        public Object traverse(final Object node) {
-            return null;
-        }
-
-        public boolean visitContainer(final PicoContainer pico) {
-            return CONTINUE_TRAVERSAL;
-        }
-
-        // /CLOVER:ON
-
-        public void visitComponentAdapter(final ComponentAdapter componentAdapter) {
-            verifiedComponentAdapters.add(componentAdapter);
-        }
-
-        public void visitComponentFactory(final ComponentFactory componentFactory) {
-            verifiedComponentFactories.add(componentFactory);
-        }
-
-        public void visitParameter(final Parameter parameter) {
-
-        }
-    }
+    @Override
+    public void visitParameter(final Parameter parameter) { }
+  }
 }
