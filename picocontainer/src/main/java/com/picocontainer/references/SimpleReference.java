@@ -13,25 +13,22 @@ import com.picocontainer.ObjectReference;
 import java.io.Serializable;
 
 /**
- * Simple instance implementation of ObjectReference.
+ * Simple instance implementation of {@link ObjectReference}.
  *
  * @author Aslak Helles&oslash;y
  * @author Konstantin Pribluda
  */
 @SuppressWarnings("serial")
-public class SimpleReference<T> implements ObjectReference<T>,
-		Serializable {
-	private T instance;
+public class SimpleReference<T> implements ObjectReference<T>, Serializable {
+  private T instance;
 
-	public SimpleReference() {
-	    // no-op
-	}
+  @Override
+  public T get() {
+    return instance;
+  }
 
-	public T get() {
-		return instance;
-	}
-
-	public void set(final T item) {
-		this.instance = item;
-	}
+  @Override
+  public void set(final T instance) {
+    this.instance = instance;
+  }
 }
