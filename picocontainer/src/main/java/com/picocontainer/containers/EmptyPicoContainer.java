@@ -10,8 +10,14 @@
 package com.picocontainer.containers;
 
 import com.googlecode.jtype.Generic;
-import com.picocontainer.*;
+import com.picocontainer.ComponentAdapter;
+import com.picocontainer.Converters;
+import com.picocontainer.Converting;
+import com.picocontainer.NameBinding;
+import com.picocontainer.PicoContainer;
+import com.picocontainer.PicoVisitor;
 import com.picocontainer.converters.ConvertsNothing;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -21,114 +27,161 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Empty pico container serving as recoil damper in situations where you
+ * Empty {@link PicoContainer} serving as recoil damper in situations where you
  * do not like to check whether container reference supplied to you
- * is null or not
+ * is {@code null} or not.
  *
  * @author Konstantin Pribluda
  */
 @SuppressWarnings("serial")
 public class EmptyPicoContainer implements PicoContainer, Converting, Serializable {
+  @Nullable
+  @Override
+  public Object getComponent(final Object keyOrType) {
+    return null;
+  }
 
-    public Object getComponent(final Object keyOrType) {
-        return null;
-    }
+  @Nullable
+  @Override
+  public Object getComponentInto(final Object keyOrType, final Type into) {
+    return null;
+  }
 
-    public Object getComponentInto(final Object keyOrType, final Type into) {
-        return null;
-    }
+  @Nullable
+  @Override
+  public <T> T getComponent(final Class<T> componentType) {
+    return null;
+  }
 
-    public <T> T getComponent(final Class<T> componentType) {
-        return null;
-    }
+  @Nullable
+  @Override
+  public <T> T getComponent(final Generic<T> componentType) {
+    return null;
+  }
 
-    public <T> T getComponent(final Generic<T> componentType) {
-        return null;
-    }
+  @Nullable
+  @Override
+  public <T> T getComponentInto(final Class<T> componentType, final Type into) {
+    return null;
+  }
 
-    public <T> T getComponentInto(final Class<T> componentType, final Type into) {
-        return null;
-    }
+  @Nullable
+  @Override
+  public <T> T getComponentInto(final Generic<T> componentType, final Type into) {
+    return null;
+  }
 
-    public <T> T getComponentInto(final Generic<T> componentType, final Type into) {
-        return null;
-    }
+  @Nullable
+  @Override
+  public <T> T getComponent(
+      final Class<T> componentType,
+      final Class<? extends Annotation> binding,
+      final Type into) {
+    return null;
+  }
 
-    public <T> T getComponent(final Class<T> componentType, final Class<? extends Annotation> binding, final Type into) {
-        return null;
-    }
+  @Nullable
+  @Override
+  public <T> T getComponent(
+      final Class<T> componentType,
+      final Class<? extends Annotation> binding) {
+    return null;
+  }
 
-    public <T> T getComponent(final Class<T> componentType, final Class<? extends Annotation> binding) {
-        return null;
-    }
+  @Nullable
+  @Override
+  public List<Object> getComponents() {
+    return Collections.emptyList();
+  }
 
-    public List<Object> getComponents() {
-        return Collections.emptyList();
-    }
+  @Nullable
+  @Override
+  public PicoContainer getParent() {
+    return null;
+  }
 
-    public PicoContainer getParent() {
-        return null;
-    }
+  @Nullable
+  @Override
+  public ComponentAdapter<?> getComponentAdapter(final Object key) {
+    return null;
+  }
 
-    public ComponentAdapter<?> getComponentAdapter(final Object key) {
-        return null;
-    }
+  @Nullable
+  @Override
+  public <T> ComponentAdapter<T> getComponentAdapter(
+      final Class<T> componentType,
+      final NameBinding nameBinding) {
+    return null;
+  }
 
-    public <T> ComponentAdapter<T> getComponentAdapter(final Class<T> componentType, final NameBinding nameBinding) {
-        return null;
-    }
+  @Nullable
+  @Override
+  public <T> ComponentAdapter<T> getComponentAdapter(
+      final Generic<T> componentType,
+      final NameBinding nameBinding) {
+    return null;
+  }
 
-    public <T> ComponentAdapter<T> getComponentAdapter(final Generic<T> componentType, final NameBinding nameBinding) {
-        return null;
-    }
+  @Nullable
+  @Override
+  public <T> ComponentAdapter<T> getComponentAdapter(
+      final Class<T> componentType,
+      final Class<? extends Annotation> binding) {
+    return null;
+  }
 
-    public <T> ComponentAdapter<T> getComponentAdapter(final Class<T> componentType, final Class<? extends Annotation> binding) {
-        return null;
-    }
+  @Nullable
+  @Override
+  public <T> ComponentAdapter<T> getComponentAdapter(
+      final Generic<T> componentType,
+      final Class<? extends Annotation> binding) {
+    return null;
+  }
 
-    public <T> ComponentAdapter<T> getComponentAdapter(final Generic<T> componentType, final Class<? extends Annotation> binding) {
-        return null;
-    }
+  @Override
+  public Collection<ComponentAdapter<?>> getComponentAdapters() {
+    return Collections.emptyList();
+  }
 
-    public Collection<ComponentAdapter<?>> getComponentAdapters() {
-        return Collections.emptyList();
-    }
+  @Override
+  public <T> List<ComponentAdapter<T>> getComponentAdapters(final Class<T> componentType) {
+    return Collections.emptyList();
+  }
 
-    public <T> List<ComponentAdapter<T>> getComponentAdapters(final Class<T> componentType) {
-        return Collections.emptyList();
-    }
+  @Override
+  public <T> List<ComponentAdapter<T>> getComponentAdapters(final Generic<T> componentType) {
+    return Collections.emptyList();
+  }
 
-    public <T> List<ComponentAdapter<T>> getComponentAdapters(final Generic<T> componentType) {
-        return Collections.emptyList();
-    }
+  @Override
+  public <T> List<ComponentAdapter<T>> getComponentAdapters(
+      final Class<T> componentType,
+      final Class<? extends Annotation> binding) {
+    return Collections.emptyList();
+  }
 
-    public <T> List<ComponentAdapter<T>> getComponentAdapters(final Class<T> componentType, final Class<? extends Annotation> binding) {
-        return Collections.emptyList();
-    }
+  @Override
+  public <T> List<ComponentAdapter<T>> getComponentAdapters(
+      final Generic<T> componentType,
+      final Class<? extends Annotation> binding) {
+    return Collections.emptyList();
+  }
 
-    public <T> List<ComponentAdapter<T>> getComponentAdapters(final Generic<T> componentType, final Class<? extends Annotation> binding) {
-        return Collections.emptyList();
-    }
+  @Override
+  public void accept(final PicoVisitor visitor) { }
 
-    /**
-     * we do not have anything to do here.
-     */
-    public void accept(final PicoVisitor visitor) {
-        //Does nothing.
-    }
+  @Override
+  public <T> List<T> getComponents(final Class<T> componentType) {
+    return Collections.emptyList();
+  }
 
-    /** {@inheritDoc} **/
-    public <T> List<T> getComponents(final Class<T> componentType) {
-        return Collections.emptyList();
-    }
+  @Override
+  public String toString() {
+    return "(empty)";
+  }
 
-    @Override
-    public String toString() {
-        return "(empty)";
-    }
-
-    public Converters getConverters() {
-        return new ConvertsNothing();
-    }
-
+  @Override
+  public Converters getConverters() {
+    return new ConvertsNothing();
+  }
 }
