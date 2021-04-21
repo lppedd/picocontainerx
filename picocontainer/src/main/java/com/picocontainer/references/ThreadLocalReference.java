@@ -15,24 +15,13 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
- * Gets and sets references on Thread Local
+ * Gets and sets references on {@link ThreadLocal}.
+ *
  * @author Paul Hammant
  */
 @SuppressWarnings("serial")
 public class ThreadLocalReference<T> extends ThreadLocal<T> implements ObjectReference<T>, Serializable {
+  private void writeObject(final ObjectOutputStream out) { }
 
-    private void writeObject(final ObjectOutputStream out) {
-        if(out != null)
-		 {
-			; // eliminate warning because of unused parameter
-		}
-    }
-
-    private void readObject(final ObjectInputStream in) {
-        if(in != null)
-		 {
-			; // eliminate warning because of unused parameter
-		}
-    }
-
+  private void readObject(final ObjectInputStream in) { }
 }
