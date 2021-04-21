@@ -10,7 +10,11 @@
 
 package com.picocontainer.behaviors;
 
-import com.picocontainer.*;
+import com.picocontainer.Characteristics;
+import com.picocontainer.ComponentAdapter;
+import com.picocontainer.ComponentMonitor;
+import com.picocontainer.LifecycleStrategy;
+import com.picocontainer.behaviors.Storing.Stored;
 import com.picocontainer.parameters.ConstructorParameters;
 import com.picocontainer.parameters.FieldParameters;
 import com.picocontainer.parameters.MethodParameters;
@@ -18,48 +22,80 @@ import com.picocontainer.references.ThreadLocalReference;
 
 import java.util.Properties;
 
-/** @author Paul Hammant */
+/**
+ * @author Paul Hammant
+ */
 @SuppressWarnings("serial")
 public class ThreadCaching extends AbstractBehavior {
+  @Override
+  public <T> ComponentAdapter<T> createComponentAdapter(
+      final ComponentMonitor monitor,
+      final LifecycleStrategy lifecycle,
+      final Properties componentProps,
+      final Object key,
+      final Class<T> impl,
+      final ConstructorParameters constructorParams,
+      final FieldParameters[] fieldParams,
+      final MethodParameters[] methodParams) {
+    if (removePropertiesIfPresent(componentProps, Characteristics.NO_CACHE)) {
+      return super.createComponentAdapter(
+          monitor,
+          lifecycle,
+          componentProps,
+          key,
+          impl,
+          constructorParams,
+          fieldParams,
+          methodParams
+      );
+    }
 
-    @Override
-	public <T> ComponentAdapter<T> createComponentAdapter(final ComponentMonitor monitor, final LifecycleStrategy lifecycle,
-                        final Properties componentProps, final Object key, final Class<T> impl, final ConstructorParameters constructorParams, final FieldParameters[] fieldParams, final MethodParameters[] methodParams) throws PicoCompositionException {
-        if (removePropertiesIfPresent(componentProps, Characteristics.NO_CACHE)) {
-            return super.createComponentAdapter(monitor, lifecycle, componentProps, key, impl, constructorParams, fieldParams, methodParams);
-        }
-        removePropertiesIfPresent(componentProps, Characteristics.CACHE);
-        return monitor.changedBehavior(new ThreadCached<T>(
-                super.createComponentAdapter(monitor, lifecycle, componentProps, key, impl, constructorParams, fieldParams, methodParams)));
+    removePropertiesIfPresent(componentProps, Characteristics.CACHE);
+    return monitor.changedBehavior(
+        new ThreadCached<>(
+            super.createComponentAdapter(
+                monitor,
+                lifecycle,
+                componentProps,
+                key,
+                impl,
+                constructorParams,
+                fieldParams,
+                methodParams
+            )
+        )
+    );
+  }
 
+  @Override
+  public <T> ComponentAdapter<T> addComponentAdapter(
+      final ComponentMonitor monitor,
+      final LifecycleStrategy lifecycle,
+      final Properties componentProps,
+      final ComponentAdapter<T> adapter) {
+    if (removePropertiesIfPresent(componentProps, Characteristics.NO_CACHE)) {
+      return super.addComponentAdapter(monitor, lifecycle, componentProps, adapter);
+    }
+
+    removePropertiesIfPresent(componentProps, Characteristics.CACHE);
+    return monitor.changedBehavior(
+        new ThreadCached<>(super.addComponentAdapter(monitor, lifecycle, componentProps, adapter))
+    );
+  }
+
+  /**
+   * This behavior supports cached values per thread.
+   *
+   * @author Paul Hammant
+   */
+  public static final class ThreadCached<T> extends Stored<T> {
+    public ThreadCached(final ComponentAdapter<T> delegate) {
+      super(delegate, new ThreadLocalReference<>());
     }
 
     @Override
-	public <T> ComponentAdapter<T> addComponentAdapter(final ComponentMonitor monitor, final LifecycleStrategy lifecycle,
-                                                       final Properties componentProps, final ComponentAdapter<T> adapter) {
-        if (removePropertiesIfPresent(componentProps, Characteristics.NO_CACHE)) {
-            return super.addComponentAdapter(monitor, lifecycle, componentProps, adapter);
-        }
-        removePropertiesIfPresent(componentProps, Characteristics.CACHE);
-        return monitor.changedBehavior(new ThreadCached<T>(super.addComponentAdapter(monitor, lifecycle, componentProps, adapter)));
+    public String getDescriptor() {
+      return "ThreadCached" + getLifecycleDescriptor();
     }
-
-    /**
-     * <p>
-     * This behavior supports caches values per thread.
-     * </p>
-     *
-     * @author Paul Hammant
-     */
-    public static final class ThreadCached<T> extends Storing.Stored<T> {
-
-        public ThreadCached(final ComponentAdapter<T> delegate) {
-            super(delegate, new ThreadLocalReference<Instance<T>>());
-        }
-
-        @Override
-		public String getDescriptor() {
-            return "ThreadCached" + getLifecycleDescriptor();
-        }
-    }
+  }
 }
