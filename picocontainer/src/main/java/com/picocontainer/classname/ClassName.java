@@ -8,42 +8,46 @@
 package com.picocontainer.classname;
 
 /**
- * ClassName is a simple wrapper for a class name which is used as a key in
+ * A simple wrapper for a class name which is used as a key in
  * the registration of components in PicoContainer.
  *
  * @author Paul Hammant
  */
 public class ClassName implements CharSequence {
-    private final String className;
+  private final String className;
 
-    public ClassName(final String className) {
-        this.className = className;
-    }
+  public ClassName(final String className) {
+    this.className = className;
+  }
 
-    public int length() {
-        return className.length();
-    }
+  @Override
+  public int length() {
+    return className.length();
+  }
 
-    public char charAt(final int ix) {
-        return className.charAt(ix);
-    }
+  @Override
+  public char charAt(final int ix) {
+    return className.charAt(ix);
+  }
 
-    public CharSequence subSequence(final int from, final int to) {
-        return className.subSequence(from, to);
-    }
+  @Override
+  public CharSequence subSequence(final int from, final int to) {
+    return className.subSequence(from, to);
+  }
 
-    @Override
-	public String toString() {
-        return className.toString();
-    }
+  @Override
+  public String toString() {
+    return className;
+  }
 
-    @Override
-	public int hashCode() {
-        return className.hashCode();
-    }
+  @Override
+  public int hashCode() {
+    return className.hashCode();
+  }
 
-    @Override
-	public boolean equals(final Object o) {
-        return className.equals(o);
-    }
+  @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+  @Override
+  public boolean equals(final Object o) {
+    return className.equals(o);
+  }
 }
