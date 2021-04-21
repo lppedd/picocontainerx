@@ -11,53 +11,59 @@ import com.picocontainer.ComponentAdapter;
 import com.picocontainer.ComponentMonitor;
 import com.picocontainer.ComponentMonitorStrategy;
 import com.picocontainer.LifecycleStrategy;
+import org.jetbrains.annotations.Contract;
 
 import java.io.Serializable;
 
 /**
- * Abstract base class for lifecycle strategy implementation supporting a {@link ComponentMonitor}.
+ * Abstract base class for lifecycle strategy implementations supporting a {@link ComponentMonitor}.
  *
  * @author J&ouml;rg Schaible
  */
 @SuppressWarnings("serial")
-public abstract class AbstractMonitoringLifecycleStrategy implements LifecycleStrategy, ComponentMonitorStrategy, Serializable {
+public abstract class AbstractMonitoringLifecycleStrategy
+    implements LifecycleStrategy,
+               ComponentMonitorStrategy,
+               Serializable {
+  /**
+   * Component monitor that receives lifecycle state.
+   */
+  private ComponentMonitor monitor;
 
-	/**
-	 * Component monitor that receives lifecycle state.
-	 */
-    private ComponentMonitor monitor;
+  /**
+   * @param monitor the monitor to use
+   * @throws NullPointerException if the monitor is {@code null}
+   */
+  public AbstractMonitoringLifecycleStrategy(final ComponentMonitor monitor) {
+    changeMonitor(monitor);
+  }
 
-    /**
-     * Construct a AbstractMonitoringLifecycleStrategy.
-     *
-     * @param monitor the monitor to use
-     * @throws NullPointerException if the monitor is <code>null</code>
-     */
-    public AbstractMonitoringLifecycleStrategy(final ComponentMonitor monitor) {
-        changeMonitor(monitor);
+  /**
+   * Swaps the current monitor with a replacement.
+   *
+   * @param newMonitor the new monitor
+   * @throws NullPointerException if the passed in monitor is null
+   */
+  @Contract("null -> fail")
+  @Override
+  public ComponentMonitor changeMonitor(final ComponentMonitor newMonitor) {
+    if (newMonitor == null) {
+      throw new NullPointerException("Monitor is null");
     }
 
-    /**
-     * Swaps the current monitor with a replacement.
-     * @param newMonitor The new monitor.
-     * @throws NullPointerException if the passed in monitor is null.
-     */
-    public ComponentMonitor changeMonitor(final ComponentMonitor newMonitor) {
-        if (newMonitor == null) {
-            throw new NullPointerException("Monitor is null");
-        }
-        ComponentMonitor oldValue = monitor;
-        this.monitor = newMonitor;
-        
-        return oldValue;
-    }
+    final ComponentMonitor oldValue = monitor;
+    monitor = newMonitor;
 
-    public ComponentMonitor currentMonitor() {
-        return monitor;
-    }
+    return oldValue;
+  }
 
-    public boolean isLazy(final ComponentAdapter<?> adapter) {
-        return false;
-    }
+  @Override
+  public ComponentMonitor currentMonitor() {
+    return monitor;
+  }
 
+  @Override
+  public boolean isLazy(final ComponentAdapter<?> adapter) {
+    return false;
+  }
 }
