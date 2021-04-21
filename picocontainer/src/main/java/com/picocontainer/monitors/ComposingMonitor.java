@@ -12,38 +12,40 @@ import com.picocontainer.MutablePicoContainer;
 import com.picocontainer.PicoContainer;
 
 /**
- * The first of a list of composers passed in that responds with an instance for a missing component will
- * be used.
+ * The first of a list of composers passed in that responds with an instance
+ * for a missing component will be used.
  */
+@SuppressWarnings("serial")
 public class ComposingMonitor extends AbstractComponentMonitor {
-    private final Composer[] composers;
+  private final Composer[] composers;
 
-    public ComposingMonitor(final ComponentMonitor delegate, final Composer... composers) {
-        super(delegate);
-        this.composers = composers;
+  public ComposingMonitor(final ComponentMonitor delegate, final Composer... composers) {
+    super(delegate);
+    this.composers = composers;
+  }
+
+  public ComposingMonitor(final Composer... composers) {
+    this.composers = composers;
+  }
+
+  @Override
+  public Object noComponentFound(final MutablePicoContainer container, final Object key) {
+    for (final Composer composer : composers) {
+      final Object retVal = composer.compose(container, key);
+
+      if (retVal != null) {
+        return retVal;
+      }
     }
 
-    public ComposingMonitor(final Composer... composers) {
-        this.composers = composers;
-    }
+    return super.noComponentFound(container, key);
+  }
 
-    @Override
-    public Object noComponentFound(final MutablePicoContainer container, final Object key) {
-        for (Composer composer : composers) {
-            Object retVal = composer.compose(container, key);
-            if (retVal != null) {
-                return retVal;
-            }
-        }
-        return super.noComponentFound(container, key);
-    }
-
-    /**
-     * A Composer can be used to make components that are otherwise missing.
-     */
-    public static interface Composer {
-        public Object compose(PicoContainer container, Object key);
-    }
-
-
+  /**
+   * A Composer can be used to make components that are otherwise missing.
+   */
+  @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
+  public interface Composer {
+    Object compose(final PicoContainer container, final Object key);
+  }
 }
