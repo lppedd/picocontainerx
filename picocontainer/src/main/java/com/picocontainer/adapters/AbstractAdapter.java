@@ -17,15 +17,21 @@ import com.picocontainer.injectors.Provider;
 import com.picocontainer.injectors.ProviderAdapter;
 import com.picocontainer.monitors.AbstractComponentMonitor;
 import com.picocontainer.monitors.NullComponentMonitor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 
 /**
- * Base class for a ComponentAdapter with general functionality.
- * This implementation provides basic checks for a healthy implementation of a ComponentAdapter.
- * It does not allow to use <code>null</code> for the component key or the implementation,
- * ensures that the implementation is a concrete class and that the key is assignable from the
+ * <p>
+ * Base class for a {@link ComponentAdapter} with general functionality.
+ * This implementation provides basic checks for a healthy implementation of a {@code ComponentAdapter}.
+ * </p>
+ * <p>
+ * It does not allow to use {@code null} for the component key or the implementation,
+ * ensures that the implementation is a concrete class, and that the key is assignable from the
  * implementation if the key represents a type.
+ * </p>
  *
  * @author Paul Hammant
  * @author Aslak Helles&oslash;y
@@ -33,117 +39,118 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 public abstract class AbstractAdapter<T> implements ComponentAdapter<T>, ComponentMonitorStrategy, Serializable {
-    private Object key;
-    private Class<T> impl;
-    private ComponentMonitor monitor;
+  private final Object key;
+  private final Class<T> impl;
+  private ComponentMonitor monitor;
 
-    /**
-     * Constructs a new ComponentAdapter for the given key and implementation.
-     * @param key the search key for this implementation
-     * @param impl the concrete implementation
-     */
-    public AbstractAdapter(final Object key, final Class impl) {
-        this(key, impl, new AbstractComponentMonitor());
-        this.monitor = new NullComponentMonitor();
+  /**
+   * Constructs a new {@link ComponentAdapter} for the given key and implementation.
+   *
+   * @param key the search key for this implementation
+   * @param impl the concrete implementation
+   */
+  public AbstractAdapter(final Object key, final Class impl) {
+    this(key, impl, new AbstractComponentMonitor());
+    monitor = new NullComponentMonitor();
+  }
+
+  /**
+   * Constructs a new {@link ComponentAdapter} for the given key and implementation.
+   *
+   * @param key the search key for this implementation
+   * @param impl the concrete implementation
+   * @param monitor the component monitor used by this {@code ComponentAdapter}
+   */
+  public AbstractAdapter(final Object key, final Class impl, final ComponentMonitor monitor) {
+    if (monitor == null) {
+      throw new NullPointerException("ComponentMonitor==null");
     }
 
-    /**
-     * Constructs a new ComponentAdapter for the given key and implementation.
-     * @param key the search key for this implementation
-     * @param impl the concrete implementation
-     * @param monitor the component monitor used by this ComponentAdapter
-     */
-    public AbstractAdapter(final Object key, final Class impl, final ComponentMonitor monitor) {
-        if (monitor == null) {
-            throw new NullPointerException("ComponentMonitor==null");
+    this.monitor = monitor;
+
+    if (impl == null) {
+      throw new NullPointerException("impl");
+    }
+
+    this.key = key;
+    this.impl = impl;
+    checkTypeCompatibility();
+  }
+
+  @NotNull
+  @Override
+  public Object getComponentKey() {
+    if (key == null) {
+      throw new NullPointerException("key");
+    }
+
+    return key;
+  }
+
+  @NotNull
+  @Override
+  public Class<? extends T> getComponentImplementation() {
+    return impl;
+  }
+
+  protected void checkTypeCompatibility() {
+    if (key instanceof Class) {
+      final Class<?> componentType = (Class<?>) key;
+
+      if (Provider.class.isAssignableFrom(impl)) {
+        if (!componentType.isAssignableFrom(ProviderAdapter.getProvideMethod(impl).getReturnType())) {
+          throw newCCE(componentType);
         }
-        this.monitor = monitor;
-        if (impl == null) {
-            throw new NullPointerException("impl");
-        }
-        this.key = key;
-        this.impl = impl;
-        checkTypeCompatibility();
+      } else if (!componentType.isAssignableFrom(impl)) {
+        throw newCCE(componentType);
+      }
+    }
+  }
+
+  private ClassCastException newCCE(final Class<?> componentType) {
+    return new ClassCastException(impl.getName() + " is not a " + componentType.getName());
+  }
+
+  @Override
+  public String toString() {
+    return getDescriptor() + getComponentKey();
+  }
+
+  @Override
+  public void accept(final PicoVisitor visitor) {
+    visitor.visitComponentAdapter(this);
+  }
+
+  @Override
+  public ComponentMonitor changeMonitor(final ComponentMonitor monitor) {
+    final ComponentMonitor returnValue = this.monitor;
+    this.monitor = monitor;
+    return returnValue;
+  }
+
+  @Override
+  public ComponentMonitor currentMonitor() {
+    return monitor;
+  }
+
+  @Nullable
+  @Override
+  public final ComponentAdapter<T> getDelegate() {
+    return null;
+  }
+
+  @Nullable
+  @Override
+  public final <U extends ComponentAdapter> U findAdapterOfType(final Class<U> adapterType) {
+    if (adapterType.isAssignableFrom(getClass())) {
+      return (U) this;
     }
 
-    /**
-     * {@inheritDoc}
-     * @see com.picocontainer.ComponentAdapter#getComponentKey()
-     */
-    public Object getComponentKey() {
-        if (key == null) {
-            throw new NullPointerException("key");
-        }
-        return key;
+    // noinspection SimplifiableIfStatement
+    if (getDelegate() != null) {
+      return getDelegate().findAdapterOfType(adapterType);
     }
 
-    /**
-     * {@inheritDoc}
-     * @see com.picocontainer.ComponentAdapter#getComponentImplementation()
-     */
-    public Class<? extends T> getComponentImplementation() {
-        return impl;
-    }
-
-    protected void checkTypeCompatibility() {
-        if (key instanceof Class) {
-            Class<?> componentType = (Class) key;
-            if (Provider.class.isAssignableFrom(impl)) {
-                if (!componentType.isAssignableFrom(ProviderAdapter.getProvideMethod(impl).getReturnType())) {
-                    throw newCCE(componentType);
-                }
-            } else {
-                if (!componentType.isAssignableFrom(impl)) {
-                    throw newCCE(componentType);
-                }
-            }
-        }
-    }
-
-    private ClassCastException newCCE(final Class<?> componentType) {
-        return new ClassCastException(impl.getName() + " is not a " + componentType.getName());
-    }
-
-    /**
-     * @return Returns the ComponentAdapter's class name and the component's key.
-     * @see Object#toString()
-     */
-    @Override
-	public String toString() {
-        return getDescriptor() + getComponentKey();
-    }
-
-    public void accept(final PicoVisitor visitor) {
-        visitor.visitComponentAdapter(this);
-    }
-
-    public ComponentMonitor changeMonitor(final ComponentMonitor monitor) {
-    	ComponentMonitor returnValue = this.monitor;
-        this.monitor = monitor;
-        return returnValue;
-    }
-
-    /**
-     * Returns the monitor currently used
-     * @return The ComponentMonitor currently used
-     */
-    public ComponentMonitor currentMonitor() {
-        return monitor;
-    }
-
-    public final ComponentAdapter<T> getDelegate() {
-        return null;
-    }
-
-    public final <U extends ComponentAdapter> U findAdapterOfType(final Class<U> adapterType) {
-        if (adapterType.isAssignableFrom(this.getClass())) {
-            return (U) this;
-        } else if (getDelegate() != null) {
-            return getDelegate().findAdapterOfType(adapterType);
-        }
-        return null;
-    }
-
-
-
+    return null;
+  }
 }
