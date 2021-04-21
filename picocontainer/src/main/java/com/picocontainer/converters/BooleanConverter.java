@@ -1,16 +1,14 @@
 package com.picocontainer.converters;
 
-
-
 /**
- * Converts values to 'boolean' data type objects
+ * Converts values to {@link Boolean} data type objects.
  *
  * @author Paul Hammant
  * @author Michael Rimov
  */
 class BooleanConverter implements Converter<Boolean> {
-
-    public Boolean convert(final String paramValue) {
-        return Boolean.valueOf(paramValue);
-    }
+  @Override
+  public Boolean convert(final String paramValue) {
+    return Boolean.valueOf(paramValue);
+  }
 }
