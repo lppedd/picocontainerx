@@ -1,16 +1,14 @@
 package com.picocontainer.converters;
 
-
-
 /**
- * Converts values to 'int' data type objects
+ * Converts values to {@link Integer} data type objects.
  *
  * @author Paul Hammant
  * @author Michael Rimov
  */
 class IntegerConverter implements Converter<Integer> {
-
-    public Integer convert(final String paramValue) {
-        return Integer.valueOf(paramValue);
-    }
+  @Override
+  public Integer convert(final String paramValue) {
+    return Integer.valueOf(paramValue);
+  }
 }
