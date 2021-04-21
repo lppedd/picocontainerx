@@ -8,18 +8,16 @@
 package com.picocontainer.converters;
 
 /**
- * Interface for type converters.
- *
  * @author Paul Hammant
  * @author Michael Rimov
  */
+@SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface Converter<T> {
-
-    /**
-     * Performs a conversion between the given parameter value and the target type.
-     * @param parameterValue the string value to convert.
-     * @return the resulting object.
-     */
-    T convert(String parameterValue);
-
+  /**
+   * Performs a conversion between the given parameter value and the target type.
+   *
+   * @param parameterValue the string value to convert
+   * @return the resulting object
+   */
+  T convert(final String parameterValue);
 }
