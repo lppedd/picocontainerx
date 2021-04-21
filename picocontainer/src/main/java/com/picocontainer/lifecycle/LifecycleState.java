@@ -9,66 +9,65 @@ package com.picocontainer.lifecycle;
 
 /**
  * Current lifecycle state of the container.
+ *
  * @author Michael Rimov
  * @author Paul Hammant
  */
 public interface LifecycleState {
+  /**
+   * Lifecycle state for when a component is being removed.
+   */
+  void removingComponent();
 
-	/**
-	 * Lifecycle state for when a component is being removed.
-	 */
-    void removingComponent();
+  /**
+   * Start is normally allowed if the object is constructed or already stopped.
+   * It is not allowed if the system is already started or disposed.
+   *
+   * @param containerName container debug info so {@link IllegalStateException}s can be traced
+   */
+  void starting(final String containerName);
 
-	/**
-	 * Start is normally allowed if the object is constructed or
-	 * already stopped.  It is not allowed if the system is already
-	 * started or disposed.
-	 * @param containerName Container debug info so IllegalStateExceptions
-	 * can be traced
-	 * @return true if start lifecycle methods should be allowed.
-	 */
-    void starting(String containerName);
+  /**
+   * Lifecycle state for when the container is being stopped.
+   * (i.e. right after {@code Picocontainer.stop()} has been called, but before any components are stopped)
+   */
+  void stopping(final String containerName);
 
-    /**
-     * Lifecycle state for when the container is being stopped.  (Ie, right after Picocontainer.stop()
-     * has been called, but before any components are stopped.
-     */
-    void stopping(String containerName);
+  /**
+   * Lifecycle state for when stop has been completed.
+   */
+  void stopped();
 
-    /**
-     * Lifecycle state for when stop has been completed.
-     */
-    void stopped();
+  /**
+   * Checks if current lifecycle is started.
+   *
+   * @return true if the current container state is STARTED.
+   */
+  boolean isStarted();
 
-    /**
-     * Checks if current lifecycle is started.
-     * @return true if the current container state is STARTED.
-     */
-    boolean isStarted();
+  /**
+   * Turns the lifecycle state to indicate that the {@code dispose()} process is being
+   * executed on the container.
+   */
+  void disposing(final String containerName);
 
-    /**
-     * Turns the lifecycle state to indicate that the dispose() process is being
-     * executed on the container.
-     */
-    void disposing(String containerName);
+  /**
+   * Turns the lifecycle state to completely disposed.
+   * Internally called after {@code PicoContainer#dispose()} is finished.
+   */
+  void disposed();
 
-    /**
-     * Turns the lifecycle state to completely disposed.  Internally called after PicoContainer.dispose()
-     * is finished.
-     */
-    void disposed();
+  /**
+   * Checks if the current lifecycle is disposed.
+   *
+   * @return true if the current state is DISPOSED.
+   */
+  boolean isDisposed();
 
-    /**
-     * Checks if the current lifecycle is disposed.
-     * @return true if the current state is DISPOSED.
-     */
-    boolean isDisposed();
-
-    /**
-     * Checks if the current lifecyle is stopped.
-     * @return true if the current state is STOPPED;
-     * @return
-     */
-    boolean isStopped();
-
+  /**
+   * Checks if the current lifecycle is stopped.
+   *
+   * @return true if the current state is STOPPED;
+   */
+  boolean isStopped();
 }
