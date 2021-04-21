@@ -13,26 +13,32 @@ import com.thoughtworks.paranamer.Paranamer;
 
 import java.lang.reflect.AccessibleObject;
 
+/**
+ * TODO
+ */
 public class ParameterNameBinding implements NameBinding {
-    private final AccessibleObject member;
-    private final int index;
-    private final Paranamer paranamer;
+  private final AccessibleObject member;
+  private final int index;
+  private final Paranamer paranamer;
+  private String name;
 
-    private String name;
+  public ParameterNameBinding(
+      final Paranamer paranamer,
+      final AccessibleObject member,
+      final int index) {
+    this.member = member;
+    this.paranamer = paranamer;
+    this.index = index;
+  }
 
-    public ParameterNameBinding(final Paranamer paranamer, final AccessibleObject member, final int index) {
-        this.member = member;
-        this.paranamer = paranamer;
-        this.index = index;
+  @Override
+  public String getName() {
+    if (name != null) {
+      return name;
     }
 
-    public String getName() {
-        if (name != null) {
-            return name;
-        }
-        String[] strings = paranamer.lookupParameterNames(member, false);
-        name = strings.length == 0 ? "" : strings[index];
-        return name;
-    }
+    final String[] strings = paranamer.lookupParameterNames(member, false);
+    name = strings.length == 0 ? "" : strings[index];
+    return name;
+  }
 }
-
