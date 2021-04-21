@@ -9,56 +9,56 @@
  *****************************************************************************/
 package com.picocontainer.behaviors;
 
-import com.picocontainer.*;
+import com.picocontainer.Behavior;
+import com.picocontainer.ChangedBehavior;
+import com.picocontainer.ComponentAdapter;
+import com.picocontainer.Decorator;
+import com.picocontainer.ObjectReference;
+import com.picocontainer.behaviors.Caching.Cached;
+import com.picocontainer.behaviors.Decorating.Decorated;
 
 /**
- * Static collection of factory methods for different BehaviourFactory implementations.
+ * Static collection of factory methods for different BehaviorFactory implementations.
  *
  * @author Paul Hammant
  * @author Mauro Talevi
  */
 public class Behaviors {
+  private Behaviors() {}
 
-    /**
-     * Prevents instantiation
-     */
-    private Behaviors() {
-        // no-op
-    }
+  public static Behavior implementationHiding() {
+    return new ImplementationHiding();
+  }
 
-    public static Behavior implementationHiding() {
-        return new ImplementationHiding();
-    }
+  public static Behavior caching() {
+    return new Caching();
+  }
 
-    public static Behavior caching() {
-        return new Caching();
-    }
+  public static Behavior synchronizing() {
+    return new Synchronizing();
+  }
 
-    public static Behavior synchronizing() {
-        return new Synchronizing();
-    }
+  public static Behavior locking() {
+    return new Locking();
+  }
 
-    public static Behavior locking() {
-        return new Locking();
-    }
+  public static Behavior propertyApplying() {
+    return new PropertyApplying();
+  }
 
-    public static Behavior propertyApplying() {
-        return new PropertyApplying();
-    }
+  public static Behavior automatic() {
+    return new Automating();
+  }
 
-    public static Behavior automatic() {
-        return new Automating();
-    }
+  public static <T> ChangedBehavior<T> cached(final ComponentAdapter<T> delegate) {
+    return new Cached<>(delegate);
+  }
 
-    public static <T> ChangedBehavior<T> cached(final ComponentAdapter<T> delegate) {
-        return new Caching.Cached<T>(delegate);
-    }
+  public static <T> ChangedBehavior<T> cached(final ComponentAdapter<T> delegate, final ObjectReference instanceReference) {
+    return new Cached<T>(delegate, instanceReference);
+  }
 
-    public static <T> ChangedBehavior<T> cached(final ComponentAdapter<T> delegate, final ObjectReference instanceReference) {
-        return new Caching.Cached<T>(delegate, instanceReference);
-    }
-
-    public static <T> ChangedBehavior<T> decorated(final ComponentAdapter<T> delegate, final Decorator decorator) {
-        return new Decorating.Decorated<T>(delegate, decorator);
-    }
+  public static <T> ChangedBehavior<T> decorated(final ComponentAdapter<T> delegate, final Decorator decorator) {
+    return new Decorated<>(delegate, decorator);
+  }
 }
