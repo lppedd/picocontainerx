@@ -11,53 +11,59 @@ import com.picocontainer.ComponentAdapter;
 import com.picocontainer.LifecycleStrategy;
 
 /**
- * Allow for use of alternate LifecycleStrategy strategies to be used
- * at the same time. A component can be started/stopped/disposed according
- * to *any* of the supplied LifecycleStrategy instances.
+ * Allow for use of alternate {@link LifecycleStrategy} strategies to be used at the same time.
+ * A component can be started/stopped/disposed according to <i>any</i> of the supplied
+ * {@link LifecycleStrategy} instances.
  *
  * @author Paul Hammant
  */
 public class CompositeLifecycleStrategy implements LifecycleStrategy {
+  private final LifecycleStrategy[] alternateStrategies;
 
-    private final LifecycleStrategy[] alternateStrategies;
+  public CompositeLifecycleStrategy(final LifecycleStrategy... alternateStrategies) {
+    this.alternateStrategies = alternateStrategies;
+  }
 
-    public CompositeLifecycleStrategy(final LifecycleStrategy... alternateStrategies) {
-        this.alternateStrategies = alternateStrategies;
+  @Override
+  public void start(final Object component) {
+    for (final LifecycleStrategy lifecycle : alternateStrategies) {
+      lifecycle.start(component);
+    }
+  }
+
+  @Override
+  public void stop(final Object component) {
+    for (final LifecycleStrategy lifecycle : alternateStrategies) {
+      lifecycle.stop(component);
+    }
+  }
+
+  @Override
+  public void dispose(final Object component) {
+    for (final LifecycleStrategy lifecycle : alternateStrategies) {
+      lifecycle.dispose(component);
+    }
+  }
+
+  @Override
+  public boolean hasLifecycle(final Class<?> type) {
+    for (final LifecycleStrategy lifecycle : alternateStrategies) {
+      if (lifecycle.hasLifecycle(type)) {
+        return true;
+      }
     }
 
-    public void start(final Object component) {
-        for (LifecycleStrategy lifecycle : alternateStrategies) {
-    		lifecycle.start(component);
-        }
+    return false;
+  }
+
+  @Override
+  public boolean isLazy(final ComponentAdapter<?> adapter) {
+    for (final LifecycleStrategy lifecycle : alternateStrategies) {
+      if (lifecycle.isLazy(adapter)) {
+        return true;
+      }
     }
 
-    public void stop(final Object component) {
-        for (LifecycleStrategy lifecycle : alternateStrategies) {
-    		lifecycle.stop(component);
-        }
-    }
-
-    public void dispose(final Object component) {
-        for (LifecycleStrategy lifecycle : alternateStrategies) {
-            lifecycle.dispose(component);
-        }
-    }
-
-    public boolean hasLifecycle(final Class<?> type) {
-        for (LifecycleStrategy lifecycle : alternateStrategies) {
-            if (lifecycle.hasLifecycle(type)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean isLazy(final ComponentAdapter<?> adapter) {
-        for (LifecycleStrategy lifecycle : alternateStrategies) {
-            if (lifecycle.isLazy(adapter)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    return false;
+  }
 }
