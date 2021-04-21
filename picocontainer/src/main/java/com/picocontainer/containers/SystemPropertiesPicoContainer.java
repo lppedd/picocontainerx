@@ -11,21 +11,22 @@ package com.picocontainer.containers;
 import com.picocontainer.PicoContainer;
 
 /**
- * A container backed by system properties (is a PropertiesPicoContainer)
+ * A container backed by system properties.
+ *
  * @author Konstantin Pribluda
  */
 @SuppressWarnings("serial")
 public class SystemPropertiesPicoContainer extends PropertiesPicoContainer {
+  public SystemPropertiesPicoContainer() {
+    this(null);
+  }
 
-	public SystemPropertiesPicoContainer() {
-		this(null);
-	}
-	public SystemPropertiesPicoContainer(final PicoContainer parent) {
-		super(System.getProperties(),parent);
-	}
+  public SystemPropertiesPicoContainer(final PicoContainer parent) {
+    super(System.getProperties(), parent);
+  }
 
-    @Override
-    public String toString() {
-        return "[SysProps]:" + super.getDelegate().toString();
-    }
+  @Override
+  public String toString() {
+    return "[SysProps]:" + getDelegate().toString();
+  }
 }
