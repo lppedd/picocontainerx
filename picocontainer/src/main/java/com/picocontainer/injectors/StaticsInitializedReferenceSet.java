@@ -7,6 +7,8 @@
  *****************************************************************************/
 package com.picocontainer.injectors;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
@@ -14,45 +16,42 @@ import java.util.Set;
 
 /**
  * Wrapper around a set of references to static members.
- * @author Michael Rimov
  *
+ * @author Michael Rimov
  */
 public class StaticsInitializedReferenceSet {
+  @Nullable
+  private Set<Member> referenceSet;
 
-	private Set<Member> referenceSet = null;
+  public synchronized boolean isMemberAlreadyInitialized(final Member member) {
+    if (member == null) {
+      throw new NullPointerException("member");
+    }
 
+    return getReferenceSet().contains(member);
+  }
 
-	public synchronized boolean isMemberAlreadyInitialized(final Member member) {
-		if (member == null) {
-			throw new NullPointerException("member");
-		}
-		return getReferenceSet().contains(member);
-	}
+  public synchronized void markMemberInitialized(final Member member) {
+    if (member == null) {
+      throw new NullPointerException("member");
+    }
 
-	public synchronized void markMemberInitialized(final Member member) {
+    if (!Modifier.isStatic(member.getModifiers())) {
+      throw new IllegalArgumentException("Members should only be marked if they are static");
+    }
 
-		if (member == null) {
-			throw new NullPointerException("member");
-		}
+    getReferenceSet().add(member);
+  }
 
-		if (!Modifier.isStatic(member.getModifiers())) {
-			throw new IllegalArgumentException("Members should only be marked if they are static");
-		}
+  protected Set<Member> getReferenceSet() {
+    if (referenceSet == null) {
+      referenceSet = new HashSet<>();
+    }
 
-		getReferenceSet().add(member);
-	}
+    return referenceSet;
+  }
 
-	protected Set<Member> getReferenceSet() {
-		if (referenceSet == null) {
-			referenceSet = new HashSet<Member>();
-		}
-
-		return referenceSet;
-
-	}
-
-	public synchronized void dispose() {
-		referenceSet = null;
-	}
-
+  public synchronized void dispose() {
+    referenceSet = null;
+  }
 }
