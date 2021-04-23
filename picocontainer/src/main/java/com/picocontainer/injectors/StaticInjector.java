@@ -14,11 +14,13 @@ import java.lang.reflect.Type;
 
 /**
  * Performs injection into static members of a class and does not return an instance.
- * @author Michael Rimov
  *
+ * @author Michael Rimov
  */
 public interface StaticInjector<T> extends com.picocontainer.Injector<T> {
-
-	void injectStatics(final PicoContainer container, final Type into, StaticsInitializedReferenceSet initializedReferenceSet);
-
+  void injectStatics(
+      final PicoContainer container,
+      final Type into,
+      final StaticsInitializedReferenceSet initializedReferenceSet
+  );
 }
