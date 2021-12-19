@@ -124,7 +124,7 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
    */
   private final Map<Object, ComponentAdapter<?>> keyToAdapterCache = new HashMap<>();
 
-  private final List<ComponentAdapter<?>> componentAdapters = new ArrayList<>();
+  private final Set<ComponentAdapter<?>> componentAdapters = new LinkedHashSet<>();
 
   protected final List<ComponentAdapter<?>> orderedComponentAdapters = new ArrayList<>();
 
@@ -301,7 +301,7 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
 
   @Override
   public Collection<ComponentAdapter<?>> getComponentAdapters() {
-    return Collections.unmodifiableList(getModifiableComponentAdapterList());
+    return Collections.unmodifiableSet(getModifiableComponentAdapterList());
   }
 
   @Override
@@ -1391,7 +1391,7 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
   /**
    * @return the componentAdapters
    */
-  protected List<ComponentAdapter<?>> getModifiableComponentAdapterList() {
+  protected Set<ComponentAdapter<?>> getModifiableComponentAdapterList() {
     return componentAdapters;
   }
 
