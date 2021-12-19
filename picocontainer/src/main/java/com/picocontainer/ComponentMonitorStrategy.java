@@ -9,16 +9,15 @@
 
 package com.picocontainer;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
- * <p>
  * Interface responsible for changing monitoring strategy.
  * It may be implemented by {@link PicoContainer containers} and
  * single {@link ComponentAdapter component adapters}.
- * </p>
  * <p>
  * The choice of supporting the monitor strategy is left to the
  * implementers of the container and adapters.
- * </p>
  *
  * @author Paul Hammant
  * @author Joerg Schaible
@@ -29,14 +28,16 @@ public interface ComponentMonitorStrategy {
    * Changes the {@code ComponentMonitor} used.
    *
    * @param monitor the new {@code ComponentMonitor} to use
+   *
    * @return the old {@code ComponentMonitor}
    */
-  ComponentMonitor changeMonitor(final ComponentMonitor monitor);
+  ComponentMonitor changeMonitor(@NotNull final ComponentMonitor monitor);
 
   /**
    * Returns the monitor currently used.
    *
    * @return The {@code ComponentMonitor} currently used
    */
+  @NotNull
   ComponentMonitor currentMonitor();
 }

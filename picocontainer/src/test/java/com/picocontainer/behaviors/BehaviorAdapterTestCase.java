@@ -125,6 +125,7 @@ public class BehaviorAdapterTestCase {
             super(delegate);
         }
 
+        @Override
         public String getDescriptor() {
             return null;
         }

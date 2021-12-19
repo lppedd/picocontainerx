@@ -88,6 +88,7 @@ public class BuiltInConverterTestCase {
     }
 
     private static class JPanelConverter implements Converter<JPanel> {
+        @Override
         public JPanel convert(final String paramValue) {
             return new JPanel();
         }

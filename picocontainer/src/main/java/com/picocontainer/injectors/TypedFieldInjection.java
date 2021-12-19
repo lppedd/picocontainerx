@@ -41,12 +41,13 @@ public class TypedFieldInjection extends AbstractInjectionType {
 
     private static final String INJECTION_FIELD_TYPES = "injectionFieldTypes";
 
-	public <T> ComponentAdapter<T> createComponentAdapter(final ComponentMonitor monitor,
-                                                   final LifecycleStrategy lifecycle,
-                                                   final Properties componentProps,
-                                                   final Object key,
-                                                   final Class<T> impl,
-                                                   final ConstructorParameters constructorParams, final FieldParameters[] fieldParams, final MethodParameters[] methodParams) throws PicoCompositionException {
+	@Override
+  public <T> ComponentAdapter<T> createComponentAdapter(final ComponentMonitor monitor,
+                                                        final LifecycleStrategy lifecycle,
+                                                        final Properties componentProps,
+                                                        final Object key,
+                                                        final Class<T> impl,
+                                                        final ConstructorParameters constructorParams, final FieldParameters[] fieldParams, final MethodParameters[] methodParams) throws PicoCompositionException {
         boolean requireConsumptionOfAllParameters = !(AbstractBehavior.arePropertiesPresent(componentProps, Characteristics.ALLOW_UNUSED_PARAMETERS, false));
         String fieldTypes = (String) componentProps.remove(INJECTION_FIELD_TYPES);
         if (fieldTypes == null) {
@@ -73,7 +74,7 @@ public class TypedFieldInjection extends AbstractInjectionType {
         private final List<String> classes;
 
         public TypedFieldInjector(final Object key,
-                                  final Class<?> impl,
+                                  final Class<T> impl,
                                   final ComponentMonitor monitor,
                                   final String classNames,
                                   final boolean requireUseOfallParameters,
@@ -139,6 +140,7 @@ public class TypedFieldInjection extends AbstractInjectionType {
         @Override
         protected NameBinding makeParameterNameImpl(final AccessibleObject member) {
             return new NameBinding() {
+                @Override
                 public String getName() {
                     return ((Field) member).getName();
                 }

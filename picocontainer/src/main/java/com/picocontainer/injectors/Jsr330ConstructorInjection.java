@@ -35,7 +35,7 @@ public class Jsr330ConstructorInjection extends ConstructorInjection {
 		}
 
 		@Override
-		protected void changeAccessToModifierifNeeded(final Constructor<T> ctor) {
+		protected void changeAccessToModifierIfNeeded(final Constructor<T> ctor) {
 			if ((ctor.getModifiers() & Modifier.PUBLIC) == 0) {
 				ctor.setAccessible(true);
 			}

@@ -200,6 +200,7 @@ public class Storing extends AbstractBehavior {
             return instance;
         }
 
+        @Override
         public String getDescriptor() {
             return "Stored" + getLifecycleDescriptor();
         }

@@ -110,7 +110,7 @@ public class AdaptingBehavior extends AbstractBehavior implements Behavior, Seri
     processCaching(componentProps, adapter.getComponentImplementation(), list);
     processGuarding(componentProps, adapter.getComponentImplementation(), list);
 
-    //Instantiate Chain of ComponentFactories
+    // Instantiate Chain of ComponentFactories
     Behavior lastFactory = null;
 
     for (final Behavior componentFactory : list) {
@@ -121,6 +121,7 @@ public class AdaptingBehavior extends AbstractBehavior implements Behavior, Seri
       lastFactory = componentFactory;
     }
 
+    // noinspection SimplifiableIfStatement
     if (lastFactory == null) {
       return adapter;
     }
@@ -152,7 +153,10 @@ public class AdaptingBehavior extends AbstractBehavior implements Behavior, Seri
     }
   }
 
-  protected void processCaching(final Properties componentProps, final Class<?> impl, final List<? super Behavior> list) {
+  protected void processCaching(
+      final Properties componentProps,
+      final Class<?> impl,
+      final List<? super Behavior> list) {
     if (AbstractBehavior.removePropertiesIfPresent(componentProps, Characteristics.CACHE)
         || impl.getAnnotation(Cache.class) != null) {
       list.add(new Caching());
@@ -161,7 +165,10 @@ public class AdaptingBehavior extends AbstractBehavior implements Behavior, Seri
     AbstractBehavior.removePropertiesIfPresent(componentProps, Characteristics.NO_CACHE);
   }
 
-  protected void processGuarding(final Properties componentProps, final Class<?> impl, final List<? super Behavior> list) {
+  protected void processGuarding(
+      final Properties componentProps,
+      final Class<?> impl,
+      final List<? super Behavior> list) {
     if (AbstractBehavior.arePropertiesPresent(componentProps, Characteristics.GUARD, false)) {
       list.add(new Guarding());
     }

@@ -11,9 +11,11 @@ import com.picocontainer.ComponentAdapter;
 import com.picocontainer.ComponentMonitor;
 import com.picocontainer.ComponentMonitorStrategy;
 import com.picocontainer.LifecycleStrategy;
-import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Abstract base class for lifecycle strategy implementations supporting a {@link ComponentMonitor}.
@@ -26,34 +28,21 @@ public abstract class AbstractMonitoringLifecycleStrategy
                ComponentMonitorStrategy,
                Serializable {
   /**
-   * Component monitor that receives lifecycle state.
+   * The monitor that receives lifecycle states.
    */
   private ComponentMonitor monitor;
 
-  /**
-   * @param monitor the monitor to use
-   * @throws NullPointerException if the monitor is {@code null}
-   */
-  public AbstractMonitoringLifecycleStrategy(final ComponentMonitor monitor) {
+  public AbstractMonitoringLifecycleStrategy(@NotNull final ComponentMonitor monitor) {
     changeMonitor(monitor);
   }
 
   /**
    * Swaps the current monitor with a replacement.
-   *
-   * @param newMonitor the new monitor
-   * @throws NullPointerException if the passed in monitor is null
    */
-  @Contract("null -> fail")
   @Override
-  public ComponentMonitor changeMonitor(final ComponentMonitor newMonitor) {
-    if (newMonitor == null) {
-      throw new NullPointerException("Monitor is null");
-    }
-
+  public ComponentMonitor changeMonitor(@NotNull final ComponentMonitor newMonitor) {
     final ComponentMonitor oldValue = monitor;
-    monitor = newMonitor;
-
+    monitor = requireNonNull(newMonitor, "The monitor cannot be null");
     return oldValue;
   }
 

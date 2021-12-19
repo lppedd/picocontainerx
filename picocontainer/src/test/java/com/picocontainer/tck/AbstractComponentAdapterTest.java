@@ -555,6 +555,7 @@ public abstract class AbstractComponentAdapterTest  {
             Assert.fail("Not instantiatable");
             return null;
         }
+        @Override
         public String getDescriptor() {
             return null;
         }
@@ -576,6 +577,7 @@ public abstract class AbstractComponentAdapterTest  {
             return result;
         }
 
+        @Override
         public String getDescriptor() {
             return "xxx";
         }
@@ -602,6 +604,7 @@ public abstract class AbstractComponentAdapterTest  {
             return super.getComponentInstance(container, into);
         }
 
+        @Override
         public String getDescriptor() {
             return "xxx";
         }
@@ -614,22 +617,27 @@ public abstract class AbstractComponentAdapterTest  {
             this.recorder = recorder;
         }
 
+        @Override
         public void start(final Object component) {
             recorder.append("<start");
         }
 
+        @Override
         public void stop(final Object component) {
             recorder.append("<stop");
         }
 
+        @Override
         public void dispose(final Object component) {
             recorder.append("<dispose");
         }
 
+        @Override
         public boolean hasLifecycle(final Class type) {
             return true;
         }
 
+        @Override
         public boolean isLazy(final ComponentAdapter<?> adapter) {
             return false;
         }

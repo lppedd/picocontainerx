@@ -14,46 +14,44 @@ import com.picocontainer.InjectionType;
 import java.lang.annotation.Annotation;
 
 public class Injectors {
+  public static InjectionType adaptiveDI() {
+    return new AdaptingInjection();
+  }
 
-    public static InjectionType adaptiveDI() {
-        return new AdaptingInjection();
-    }
+  public static InjectionType annotatedMethodDI(final Class<? extends Annotation> injectionAnnotation) {
+    return new AnnotatedMethodInjection(injectionAnnotation, false);
+  }
 
-    public static InjectionType annotatedMethodDI(final Class<? extends Annotation> injectionAnnotation) {
-        return new AnnotatedMethodInjection(injectionAnnotation, false);
-    }
+  public static InjectionType SDI() {
+    return new SetterInjection();
+  }
 
-    public static InjectionType SDI() {
-        return new SetterInjection();
-    }
+  public static InjectionType CDI() {
+    return new ConstructorInjection();
+  }
 
-    public static InjectionType CDI() {
-        return new ConstructorInjection();
-    }
+  public static InjectionType namedMethod() {
+    return new NamedMethodInjection();
+  }
 
-    public static InjectionType namedMethod() {
-        return new NamedMethodInjection();
-    }
+  public static InjectionType namedField() {
+    return new NamedFieldInjection();
+  }
 
-    public static InjectionType namedField() {
-        return new NamedFieldInjection();
-    }
+  public static InjectionType annotatedMethodDI() {
+    return new AnnotatedMethodInjection();
+  }
 
-    public static InjectionType annotatedMethodDI() {
-        return new AnnotatedMethodInjection();
-    }
+  public static InjectionType annotatedFieldDI(final Class<? extends Annotation> injectionAnnotation) {
+    // noinspection unchecked
+    return new AnnotatedFieldInjection(injectionAnnotation);
+  }
 
-    public static InjectionType annotatedFieldDI(final Class<? extends Annotation> injectionAnnotation) {
-        return new AnnotatedFieldInjection(injectionAnnotation);
-    }
+  public static InjectionType annotatedFieldDI() {
+    return new AnnotatedFieldInjection();
+  }
 
-
-    public static InjectionType annotatedFieldDI() {
-        return new AnnotatedFieldInjection();
-    }
-
-    public static InjectionType typedFieldDI() {
-        return new TypedFieldInjection();
-    }
-
+  public static InjectionType typedFieldDI() {
+    return new TypedFieldInjection();
+  }
 }

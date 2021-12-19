@@ -8,10 +8,21 @@
  *****************************************************************************/
 package com.picocontainer.injectors;
 
+import com.picocontainer.Characteristics;
+import com.picocontainer.ComponentAdapter;
+import com.picocontainer.ComponentMonitor;
+import com.picocontainer.ComponentMonitorStrategy;
+import com.picocontainer.InjectionType;
+import com.picocontainer.Injector;
+import com.picocontainer.LifecycleStrategy;
+import com.picocontainer.PicoContainer;
+import com.picocontainer.PicoVisitor;
 import com.picocontainer.behaviors.AbstractBehavior;
 import com.picocontainer.parameters.ConstructorParameters;
 import com.picocontainer.parameters.FieldParameters;
 import com.picocontainer.parameters.MethodParameters;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -26,153 +37,173 @@ import java.util.Properties;
  */
 @SuppressWarnings("serial")
 public class CompositeInjection extends AbstractInjectionType {
+  private final InjectionType[] injectionTypes;
 
-    private final com.picocontainer.InjectionType[] injectionTypes;
+  public CompositeInjection(@NotNull final InjectionType... injectionTypes) {
+    this.injectionTypes = injectionTypes;
+  }
 
-    public CompositeInjection(final com.picocontainer.InjectionType... injectionTypes) {
-        this.injectionTypes = injectionTypes;
+  @Override
+  public <T> ComponentAdapter<T> createComponentAdapter(
+      final ComponentMonitor monitor,
+      final LifecycleStrategy lifecycle,
+      final Properties componentProps,
+      final Object key,
+      final Class<T> impl,
+      @Nullable final ConstructorParameters constructorParams,
+      @Nullable final FieldParameters @Nullable [] fieldParams,
+      @Nullable final MethodParameters @Nullable [] methodParams) {
+    @SuppressWarnings("unchecked")
+    final com.picocontainer.Injector<T>[] injectors = new com.picocontainer.Injector[injectionTypes.length];
+
+    for (int i = 0; i < injectionTypes.length; i++) {
+      final InjectionType injectionType = injectionTypes[i];
+      injectors[i] = (com.picocontainer.Injector<T>) injectionType.createComponentAdapter(
+          monitor,
+          lifecycle,
+          componentProps,
+          key,
+          impl,
+          constructorParams,
+          fieldParams,
+          methodParams
+      );
     }
 
-    public <T> com.picocontainer.ComponentAdapter<T> createComponentAdapter(final com.picocontainer.ComponentMonitor monitor,
-                                                                            final com.picocontainer.LifecycleStrategy lifecycle,
-                                                                            final Properties componentProps,
-                                                                            final Object key,
-                                                                            final Class<T> impl,
-                                                                            final ConstructorParameters constructorParams,
-                                                                            final FieldParameters[] fieldParams,
-                                                                            final MethodParameters[] methodParams) throws com.picocontainer.PicoCompositionException {
+    final boolean useNames = AbstractBehavior.arePropertiesPresent(componentProps, Characteristics.USE_NAMES, true);
+    final Injector<T> injector = new CompositeInjector<>(key, impl, monitor, useNames, injectors);
+    return wrapLifeCycle(monitor.newInjector(injector), lifecycle);
+  }
 
-        @SuppressWarnings("unchecked")
-		com.picocontainer.Injector<T>[] injectors = new com.picocontainer.Injector[injectionTypes.length];
+  public static class CompositeInjector<T> extends AbstractInjector<T> {
+    @NotNull
+    private final com.picocontainer.Injector<T>[] injectors;
 
-        for (int i = 0; i < injectionTypes.length; i++) {
-            com.picocontainer.InjectionType injectionType = injectionTypes[i];
-            injectors[i] = (com.picocontainer.Injector<T>) injectionType.createComponentAdapter(monitor,
-                    lifecycle, componentProps, key, impl, constructorParams, fieldParams, methodParams);
-        }
-
-        boolean useNames = AbstractBehavior.arePropertiesPresent(componentProps, com.picocontainer.Characteristics.USE_NAMES, true);
-        return wrapLifeCycle(monitor.newInjector(new CompositeInjector<T>(key, impl, monitor, useNames, injectors)), lifecycle);
+    @SafeVarargs
+    public CompositeInjector(
+        @NotNull final Object key,
+        @NotNull final Class<T> impl,
+        @NotNull final ComponentMonitor monitor,
+        final boolean useNames,
+        @NotNull final com.picocontainer.Injector<T>... injectors) {
+      super(key, impl, monitor, useNames);
+      this.injectors = injectors;
     }
 
-    public static class CompositeInjector<T> extends AbstractInjector<T> {
+    @Override
+    public T getComponentInstance(final PicoContainer container, final Type into) {
+      T instance = null;
 
-        private final com.picocontainer.Injector<T>[] injectors;
-
-        public CompositeInjector(final Object key, final Class<?> impl, final com.picocontainer.ComponentMonitor monitor,
-                                 final boolean useNames, final com.picocontainer.Injector<T>... injectors) {
-            super(key, impl, monitor, useNames);
-            this.injectors = injectors;
+      for (final Class<?> eachSuperClass : getListOfSupertypesToDecorate(getComponentImplementation())) {
+        for (final com.picocontainer.Injector<T> injector : injectors) {
+          if (instance == null) {
+            instance = injector.getComponentInstance(container, NOTHING.class);
+          } else {
+            injector.partiallyDecorateComponentInstance(container, into, instance, eachSuperClass);
+          }
         }
+      }
 
-        @Override
-        public T getComponentInstance(final com.picocontainer.PicoContainer container, final Type into) throws com.picocontainer.PicoCompositionException {
-	            T instance = null;
+      return instance;
+    }
 
-	            for (Class<?> eachSuperClass : this.getListOfSupertypesToDecorate(getComponentImplementation())) {
-		            for (com.picocontainer.Injector<T> injector : injectors) {
-		                if (instance == null) {
-		                    instance = injector.getComponentInstance(container, NOTHING.class);
-		                } else {
-		                    injector.partiallyDecorateComponentInstance(container, into, instance, eachSuperClass);
-		                }
-		            }
-	            }
-	            return instance;
-        }
+    protected Class<?>[] getListOfSupertypesToDecorate(final Class<?> startClass) {
+      if (startClass == null) {
+        throw new NullPointerException("startClass");
+      }
 
-        protected Class<?>[] getListOfSupertypesToDecorate(final Class<?> startClass) {
-        	if (startClass == null) {
-        		throw new NullPointerException("startClass");
-        	}
+      final List<Class<?>> result = new ArrayList<>();
+      Class<?> current = startClass;
 
-        	List<Class<?>> result = new ArrayList<Class<?>>();
+      while (!Object.class.getName().equals(current.getName())) {
+        result.add(current);
+        current = current.getSuperclass();
+      }
 
-        	Class<?> current = startClass;
-        	while (!Object.class.getName().equals(current.getName())) {
-        		result.add(current);
-        		current = current.getSuperclass();
-        	}
+      // Needed for: com.picocontainer.injectors.AdaptingInjectionTestCase.testSingleUsecanBeInstantiatedByDefaultComponentAdapter()
+      if (result.isEmpty()) {
+        result.add(Object.class);
+      }
 
-        	//Needed for: com.picocontainer.injectors.AdaptingInjectionTestCase.testSingleUsecanBeInstantiatedByDefaultComponentAdapter()
-        	if (result.size() == 0) {
-        		result.add(Object.class);
-        	}
+      // Start with base class, not derived class.
+      Collections.reverse(result);
+      return result.toArray(new Class[0]);
+    }
 
-        	//Start with base class, not derived class.
-        	Collections.reverse(result);
+    /**
+     * Performs a set of partial injections starting at the base class and working its
+     * way down.
+     * <p>{@inheritDoc}</p>
+     *
+     * @return the object returned is the result of the last of the injectors delegated to
+     */
+    @Override
+    public Object decorateComponentInstance(
+        final PicoContainer container,
+        final Type into,
+        final T instance) {
+      Object result = null;
+      for (final Class<?> eachSuperClass : getListOfSupertypesToDecorate(instance.getClass())) {
+        result = partiallyDecorateComponentInstance(container, into, instance, eachSuperClass);
+      }
 
-        	return result.toArray(new Class[result.size()]);
-        }
-
-
-        /**
-         * Performs a set of partial injections starting at the base class and working its
-         * way down.
-         * <p>{@inheritDoc}</p>
-         * @return the object returned is the result of the last of the injectors delegated to
-         */
-        @Override
-        public Object decorateComponentInstance(final com.picocontainer.PicoContainer container, final Type into, final T instance) {
-        	Object result = null;
-        	for (Class<?> eachSuperClass : this.getListOfSupertypesToDecorate(instance.getClass())) {
-        		result = partiallyDecorateComponentInstance(container, into, instance, eachSuperClass);
-        	}
-
-        	return result;
-
-        }
-
-		@Override
-		public Object partiallyDecorateComponentInstance(final com.picocontainer.PicoContainer container, final Type into, final T instance,
-                                                     final Class<?> classFilter) {
-			Object result = null;
-
-            for (com.picocontainer.Injector<T> injector : injectors) {
-            	result = injector.partiallyDecorateComponentInstance(container, into, instance, classFilter);
-            }
-            return result;
-		}
-
-        @Override
-        public void verify(final com.picocontainer.PicoContainer container) throws com.picocontainer.PicoCompositionException {
-            for (com.picocontainer.Injector<T> injector : injectors) {
-                injector.verify(container);
-            }
-        }
-
-        @Override
-        public final void accept(final com.picocontainer.PicoVisitor visitor) {
-            super.accept(visitor);
-            for (com.picocontainer.Injector<T> injector : injectors) {
-                injector.accept(visitor);
-            }
-        }
-
-        @Override
-        public String getDescriptor() {
-            StringBuilder sb = new StringBuilder("CompositeInjector(");
-            for (com.picocontainer.Injector<T> injector : injectors) {
-                sb.append(injector.getDescriptor());
-            }
-
-            if (sb.charAt(sb.length() - 1) == '-') {
-            	sb.deleteCharAt(sb.length()-1); // remove last dash
-            }
-
-            return sb.toString().replace("-", "+") + ")-";
-        }
-
-		@Override
-		public com.picocontainer.ComponentMonitor changeMonitor(final com.picocontainer.ComponentMonitor monitor) {
-			com.picocontainer.ComponentMonitor result = super.changeMonitor(monitor);
-			for (com.picocontainer.Injector<?> eachInjector : injectors) {
-				if (eachInjector instanceof com.picocontainer.ComponentMonitorStrategy) {
-					((com.picocontainer.ComponentMonitorStrategy)eachInjector).changeMonitor(monitor);
-				}
-			}
-			return result;
-		}
+      return result;
 
     }
+
+    @Override
+    public Object partiallyDecorateComponentInstance(
+        final PicoContainer container, final Type into, final T instance,
+        final Class<?> classFilter) {
+      Object result = null;
+
+      for (final com.picocontainer.Injector<T> injector : injectors) {
+        result = injector.partiallyDecorateComponentInstance(container, into, instance, classFilter);
+      }
+      return result;
+    }
+
+    @Override
+    public void verify(final PicoContainer container) {
+      for (final com.picocontainer.Injector<T> injector : injectors) {
+        injector.verify(container);
+      }
+    }
+
+    @Override
+    public final void accept(final PicoVisitor visitor) {
+      super.accept(visitor);
+
+      for (final com.picocontainer.Injector<T> injector : injectors) {
+        injector.accept(visitor);
+      }
+    }
+
+    @Override
+    public String getDescriptor() {
+      final StringBuilder sb = new StringBuilder("CompositeInjector(");
+      for (final com.picocontainer.Injector<T> injector : injectors) {
+        sb.append(injector.getDescriptor());
+      }
+
+      if (sb.charAt(sb.length() - 1) == '-') {
+        sb.deleteCharAt(sb.length() - 1); // remove last dash
+      }
+
+      return sb.toString().replace("-", "+") + ")-";
+    }
+
+    @Override
+    public ComponentMonitor changeMonitor(final ComponentMonitor monitor) {
+      final ComponentMonitor result = super.changeMonitor(monitor);
+
+      for (final com.picocontainer.Injector<?> eachInjector : injectors) {
+        if (eachInjector instanceof ComponentMonitorStrategy) {
+          ((ComponentMonitorStrategy) eachInjector).changeMonitor(monitor);
+        }
+      }
+
+      return result;
+    }
+  }
 }

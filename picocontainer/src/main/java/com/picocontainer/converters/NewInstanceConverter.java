@@ -9,11 +9,11 @@ import java.lang.reflect.InvocationTargetException;
  * Converts a value to an object via its single-String constructor.
  */
 public class NewInstanceConverter implements Converter<Object> {
-  private Constructor<?> c;
+  private Constructor<?> constructor;
 
   public NewInstanceConverter(final Class<?> clazz) {
     try {
-      c = clazz.getConstructor(String.class);
+      constructor = clazz.getConstructor(String.class);
     } catch (final NoSuchMethodException ignored) {
       //
     }
@@ -22,12 +22,12 @@ public class NewInstanceConverter implements Converter<Object> {
   @Nullable
   @Override
   public Object convert(final String paramValue) {
-    if (c == null) {
+    if (constructor == null) {
       return null;
     }
 
     try {
-      return c.newInstance(paramValue);
+      return constructor.newInstance(paramValue);
     } catch (final IllegalAccessException | InstantiationException | InvocationTargetException ignored) {
       //
     }

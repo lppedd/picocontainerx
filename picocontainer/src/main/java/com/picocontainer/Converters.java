@@ -7,6 +7,8 @@
  *****************************************************************************/
 package com.picocontainer;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.Type;
 
 /**
@@ -17,11 +19,11 @@ import java.lang.reflect.Type;
  */
 public interface Converters {
   /**
-   * Returns {@code true} if a converter is available to convert to the given object type.
+   * Returns if a converter is available to convert to the given object type.
    *
    * @param type the object type to convert to
    */
-  boolean canConvert(final Type type);
+  boolean canConvert(@NotNull final Type type);
 
   /**
    * Converts a particular string value into the target type.
@@ -30,5 +32,5 @@ public interface Converters {
    * @param type the object type to convert to
    * @return The converted object instance
    */
-  Object convert(final String value, final Type type);
+  Object convert(@NotNull final String value, @NotNull final Type type);
 }

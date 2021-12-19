@@ -191,19 +191,24 @@ public class CompositeInjectionTestCase {
     }
 
     private static class NonNullLifecycleStrategy implements LifecycleStrategy {
+        @Override
         public void start(final Object component) {
         }
 
+        @Override
         public void stop(final Object component) {
         }
 
+        @Override
         public void dispose(final Object component) {
         }
 
+        @Override
         public boolean hasLifecycle(final Class<?> type) {
             return false;
         }
 
+        @Override
         public boolean isLazy(final ComponentAdapter<?> adapter) {
             return false;
         }

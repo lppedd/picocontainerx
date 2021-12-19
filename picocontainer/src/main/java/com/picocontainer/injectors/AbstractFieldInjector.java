@@ -28,30 +28,37 @@ import java.util.Set;
 public abstract class AbstractFieldInjector<T> extends IterativeInjector<T> {
   public AbstractFieldInjector(
       final Object componentKey,
-      final Class<?> componentImplementation,
+      final Class<T> componentImplementation,
       final ComponentMonitor monitor,
       final boolean useNames,
       final boolean requireConsumptionOfAllParameters,
       final FieldParameters... parameters) {
-    super(componentKey, componentImplementation, monitor, useNames, requireConsumptionOfAllParameters, parameters);
+    super(
+        componentKey,
+        componentImplementation,
+        monitor,
+        useNames,
+        requireConsumptionOfAllParameters,
+        parameters
+    );
   }
 
   @Override
   protected final void unsatisfiedDependencies(
       final PicoContainer container,
       final Set<Type> unsatisfiableDependencyTypes,
-      final List<AccessibleObject> unsatisfiableDependencyMembers) {
+      final List<? extends AccessibleObject> unsatisfiableDependencyMembers) {
     final StringBuilder sb = new StringBuilder(getComponentImplementation().getName());
     sb.append(" has unsatisfied dependency for fields [");
 
     for (final AccessibleObject accessibleObject : unsatisfiableDependencyMembers) {
-      final Field m = (Field) accessibleObject;
+      final Field field = (Field) accessibleObject;
       sb.append(" ")
-          .append(m.getDeclaringClass().getName())
+          .append(field.getDeclaringClass().getName())
           .append(".")
-          .append(m.getName())
+          .append(field.getName())
           .append(" (field's type is ")
-          .append(m.getType().getName())
+          .append(field.getType().getName())
           .append(") ");
     }
 
@@ -60,17 +67,17 @@ public abstract class AbstractFieldInjector<T> extends IterativeInjector<T> {
 
   @Override
   protected boolean isAccessibleObjectEqualToParameterTarget(
-      final AccessibleObject testObject,
+      final AccessibleObject accessibleObject,
       final Parameter currentParameter) {
     if (currentParameter.getTargetName() == null) {
       return false;
     }
 
-    if (!(testObject instanceof Field)) {
-      throw new PicoCompositionException(testObject + " must be a field to use setter injection");
+    if (!(accessibleObject instanceof Field)) {
+      throw new PicoCompositionException(accessibleObject + " must be a field to use setter injection");
     }
 
-    final Field testField = (Field) testObject;
+    final Field testField = (Field) accessibleObject;
     return testField.getName().equals(currentParameter.getTargetName());
   }
 }

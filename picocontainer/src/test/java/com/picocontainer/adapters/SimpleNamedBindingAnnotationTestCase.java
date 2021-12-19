@@ -127,6 +127,7 @@ public class SimpleNamedBindingAnnotationTestCase {
 
     public class FieldInjection extends AbstractInjectionType {
 
+        @Override
         public <T> ComponentAdapter<T> createComponentAdapter(
             final ComponentMonitor monitor, final LifecycleStrategy lifecycle,
             final Properties componentProps, final Object key,
@@ -140,7 +141,7 @@ public class SimpleNamedBindingAnnotationTestCase {
 
     public static class FieldInjector<T> extends AbstractInjector<T> {
 
-        protected FieldInjector(final Object key, final Class<?> impl, final FieldParameters[] parameters, final ComponentMonitor monitor, final boolean useNames) {
+        protected FieldInjector(final Object key, final Class<T> impl, final FieldParameters[] parameters, final ComponentMonitor monitor, final boolean useNames) {
             super(key, impl, monitor, useNames, parameters);
         }
 

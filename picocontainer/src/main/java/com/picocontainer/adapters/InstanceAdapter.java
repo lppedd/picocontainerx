@@ -9,6 +9,7 @@
  *****************************************************************************/
 package com.picocontainer.adapters;
 
+import com.picocontainer.ChangedBehavior;
 import com.picocontainer.ComponentAdapter;
 import com.picocontainer.ComponentLifecycle;
 import com.picocontainer.ComponentMonitor;
@@ -21,15 +22,12 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Type;
 
 /**
- * <p>
  * {@link ComponentAdapter} which wraps a component instance.
- * </p>
  * <p>
- * This component adapter supports both a {@link com.picocontainer.ChangedBehavior}
+ * This component adapter supports both a {@link ChangedBehavior}
  * and a {@link LifecycleStrategy} to control the lifecycle of the component.
  * The lifecycle manager methods simply delegate to the lifecycle strategy methods
  * on the component instance.
- * </p>
  *
  * @author Aslak Helles&oslash;y
  * @author Paul Hammant
@@ -46,38 +44,38 @@ public final class InstanceAdapter<T> extends AbstractAdapter<T> implements Comp
   /**
    * Lifecycle Strategy for the component adapter.
    */
+  @NotNull
   private final LifecycleStrategy lifecycle;
   private boolean started;
 
   public InstanceAdapter(
-      final Object key,
+      @NotNull final Object key,
       @NotNull final T componentInstance,
-      final LifecycleStrategy lifecycle,
-      final ComponentMonitor monitor) {
-    super(key, getInstanceClass(componentInstance), monitor);
+      @NotNull final LifecycleStrategy lifecycle,
+      @NotNull final ComponentMonitor monitor) {
+    super(key, (Class<T>) componentInstance.getClass(), monitor);
     this.componentInstance = componentInstance;
     this.lifecycle = lifecycle;
   }
 
-  public InstanceAdapter(final Object key, final T componentInstance) {
+  public InstanceAdapter(
+      @NotNull final Object key,
+      @NotNull final T componentInstance) {
     this(key, componentInstance, new NullLifecycleStrategy(), new NullComponentMonitor());
   }
 
-  public InstanceAdapter(final Object key, final T componentInstance, final LifecycleStrategy lifecycle) {
+  public InstanceAdapter(
+      @NotNull final Object key,
+      @NotNull final T componentInstance,
+      @NotNull final LifecycleStrategy lifecycle) {
     this(key, componentInstance, lifecycle, new NullComponentMonitor());
   }
 
-  public InstanceAdapter(final Object key, final T componentInstance, final ComponentMonitor monitor) {
+  public InstanceAdapter(
+      @NotNull final Object key,
+      @NotNull final T componentInstance,
+      @NotNull final ComponentMonitor monitor) {
     this(key, componentInstance, new NullLifecycleStrategy(), monitor);
-  }
-
-  @NotNull
-  private static Class<?> getInstanceClass(final Object componentInstance) {
-    if (componentInstance == null) {
-      throw new NullPointerException("componentInstance cannot be null");
-    }
-
-    return componentInstance.getClass();
   }
 
   @Override

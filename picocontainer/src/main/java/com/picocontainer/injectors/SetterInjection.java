@@ -142,7 +142,7 @@ public class SetterInjection extends AbstractInjectionType {
      */
     public SetterInjector(
         final Object key,
-        final Class<?> impl,
+        final Class<T> impl,
         final ComponentMonitor monitor,
         final String prefix,
         final boolean useNames,
@@ -186,7 +186,7 @@ public class SetterInjection extends AbstractInjectionType {
     protected void unsatisfiedDependencies(
         final PicoContainer container,
         final Set<Type> unsatisfiableDependencyTypes,
-        final List<AccessibleObject> unsatisfiableDependencyMembers) {
+        final List<? extends AccessibleObject> unsatisfiableDependencyMembers) {
       if (!optional) {
         throw new UnsatisfiableDependenciesException(
             getComponentImplementation().getName()

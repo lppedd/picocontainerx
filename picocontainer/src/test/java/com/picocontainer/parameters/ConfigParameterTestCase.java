@@ -30,7 +30,8 @@ public class ConfigParameterTestCase {
 
 	// defaultparameter name, just for convenience
 	NameBinding paramNameBinding = new NameBinding() {
-		public String getName() {
+		@Override
+    public String getName() {
 			return "gloo.blum";
 		}
 

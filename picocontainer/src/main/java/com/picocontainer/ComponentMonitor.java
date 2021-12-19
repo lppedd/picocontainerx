@@ -10,6 +10,8 @@
 
 package com.picocontainer;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -31,6 +33,7 @@ public interface ComponentMonitor {
    * @param container
    * @param componentAdapter
    * @param constructor the Constructor used to instantiate the addComponent
+   *
    * @return the constructor to use in instantiation (nearly always the same one as passed in)
    */
   <T> Constructor<T> instantiating(
@@ -84,8 +87,8 @@ public interface ComponentMonitor {
    * @param args
    */
   Object invoking(
-      final PicoContainer container,
-      final ComponentAdapter<?> componentAdapter,
+      @Nullable final PicoContainer container,
+      @Nullable final ComponentAdapter<?> componentAdapter,
       final Member member,
       final Object instance,
       final Object... args
@@ -103,12 +106,12 @@ public interface ComponentMonitor {
    * @param args Arguments invoked on the member
    */
   void invoked(
-      final PicoContainer container,
-      final ComponentAdapter<?> componentAdapter,
+      @Nullable final PicoContainer container,
+      @Nullable final ComponentAdapter<?> componentAdapter,
       final Member member,
       final Object instance,
       final long duration,
-      final Object retVal,
+      @Nullable final Object retVal,
       final Object... args
   );
 
@@ -131,8 +134,8 @@ public interface ComponentMonitor {
    * @param cause the {@link RuntimeException} detailing the cause of the failure
    */
   void lifecycleInvocationFailed(
-      final MutablePicoContainer container,
-      final ComponentAdapter<?> componentAdapter,
+      final @Nullable MutablePicoContainer container,
+      final @Nullable ComponentAdapter<?> componentAdapter,
       final Method method,
       final Object instance,
       final RuntimeException cause
@@ -153,6 +156,7 @@ public interface ComponentMonitor {
    * A mechanism to monitor or override the {@link Injector}s being made for components.
    *
    * @param injector
+   *
    * @return an {@link Injector}. For most implementations, the same one as was passed in.
    */
   <T> Injector<T> newInjector(final Injector<T> injector);
@@ -161,6 +165,7 @@ public interface ComponentMonitor {
    * A mechanism to monitor or override the {@code Behaviors} being made for components.
    *
    * @param changedBehavior
+   *
    * @return an {@link Behavior}. For most implementations, the same one as was passed in.
    */
   <T> ChangedBehavior<T> changedBehavior(final ChangedBehavior<T> changedBehavior);

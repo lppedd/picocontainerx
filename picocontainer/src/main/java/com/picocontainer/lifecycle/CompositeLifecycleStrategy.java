@@ -12,7 +12,7 @@ import com.picocontainer.LifecycleStrategy;
 
 /**
  * Allow for use of alternate {@link LifecycleStrategy} strategies to be used at the same time.
- * A component can be started/stopped/disposed according to <i>any</i> of the supplied
+ * A component can be started/stopped/disposed according to <em>any</em> of the supplied
  * {@link LifecycleStrategy} instances.
  *
  * @author Paul Hammant

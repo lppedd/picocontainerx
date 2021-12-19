@@ -9,7 +9,6 @@ import com.picocontainer.PicoContainer;
 import com.picocontainer.PicoVisitor;
 import com.picocontainer.lifecycle.NullLifecycleStrategy;
 import com.picocontainer.monitors.NullComponentMonitor;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
@@ -19,6 +18,7 @@ import java.lang.reflect.Type;
  */
 @SuppressWarnings("serial")
 public abstract class AbstractInjectionType implements InjectionType, Serializable {
+  @SuppressWarnings("NoopMethodInAbstractClass")
   @Override
   public void verify(final PicoContainer container) {}
 
@@ -35,9 +35,10 @@ public abstract class AbstractInjectionType implements InjectionType, Serializab
       return injector;
     }
 
-    return new LifecycleAdapter<T>(injector, lifecycle);
+    return new LifecycleAdapter<>(injector, lifecycle);
   }
 
+  @SuppressWarnings("NoopMethodInAbstractClass")
   @Override
   public void dispose() {}
 
@@ -85,7 +86,7 @@ public abstract class AbstractInjectionType implements InjectionType, Serializab
     }
 
     @Override
-    public <U extends ComponentAdapter> U findAdapterOfType(final Class<U> adapterType) {
+    public <U extends ComponentAdapter<?>> U findAdapterOfType(final Class<U> adapterType) {
       return delegate.findAdapterOfType(adapterType);
     }
 
@@ -134,7 +135,6 @@ public abstract class AbstractInjectionType implements InjectionType, Serializab
       return new NullComponentMonitor();
     }
 
-    @Nullable
     @Override
     public ComponentMonitor currentMonitor() {
       // noinspection SimplifiableIfStatement
@@ -142,7 +142,7 @@ public abstract class AbstractInjectionType implements InjectionType, Serializab
         return ((ComponentMonitorStrategy) delegate).currentMonitor();
       }
 
-      return null;
+      return new NullComponentMonitor();
     }
 
     @Override

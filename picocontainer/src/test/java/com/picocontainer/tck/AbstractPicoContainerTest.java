@@ -614,6 +614,7 @@ public abstract class AbstractPicoContainerTest {
             return true;
         }
 
+        @Override
         public String getDescriptor() {
             return null;
         }

@@ -413,6 +413,7 @@ public final class DefaultPicoContainerTestCase extends AbstractPicoContainerTes
 			this.adapter = adapter;
 		}
 
+		@Override
 		public ComponentAdapter createComponentAdapter(
 				final ComponentMonitor monitor,
 				final LifecycleStrategy lifecycle,
@@ -422,13 +423,16 @@ public final class DefaultPicoContainerTestCase extends AbstractPicoContainerTes
 			return adapter;
 		}
 
-        public void verify(final PicoContainer container) {
+        @Override
+				public void verify(final PicoContainer container) {
         }
 
-        public void accept(final PicoVisitor visitor) {
+        @Override
+				public void accept(final PicoVisitor visitor) {
             visitor.visitComponentFactory(this);
         }
 
+		@Override
 		public void dispose() {
 			
 		}
@@ -442,34 +446,42 @@ public final class DefaultPicoContainerTestCase extends AbstractPicoContainerTes
 			this.instance = instance;
 		}
 
-		public Object getComponentKey() {
+		@Override
+    public Object getComponentKey() {
 			return instance.getClass();
 		}
 
+		@Override
 		public Class getComponentImplementation() {
 			return instance.getClass();
 		}
 
-        public Object getComponentInstance(final PicoContainer container, final Type into)
+        @Override
+				public Object getComponentInstance(final PicoContainer container, final Type into)
 				throws PicoCompositionException {
 			return instance;
 		}
 
+		@Override
 		public void verify(final PicoContainer container)
 				throws PicoCompositionException {
 		}
 
+		@Override
 		public void accept(final PicoVisitor visitor) {
         }
 
+		@Override
 		public ComponentAdapter getDelegate() {
 			return null;
 		}
 
+		@Override
 		public ComponentAdapter findAdapterOfType(final Class adapterType) {
 			return null;
 		}
 
+		@Override
 		public String getDescriptor() {
 			return null;
 		}
@@ -536,21 +548,26 @@ public final class DefaultPicoContainerTestCase extends AbstractPicoContainerTes
 	}
 
 	public static class FailingLifecycleStrategy implements LifecycleStrategy {
-		public void start(final Object component) {
+		@Override
+    public void start(final Object component) {
 			throw new RuntimeException("foo");
 		}
 
+		@Override
 		public void stop(final Object component) {
 		}
 
+		@Override
 		public void dispose(final Object component) {
 		}
 
+		@Override
 		public boolean hasLifecycle(final Class type) {
 			return true;
 		}
 
-        public boolean isLazy(final ComponentAdapter<?> adapter) {
+        @Override
+				public boolean isLazy(final ComponentAdapter<?> adapter) {
             return false;
         }
     }

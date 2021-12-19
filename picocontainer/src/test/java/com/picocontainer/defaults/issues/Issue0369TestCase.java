@@ -26,34 +26,42 @@ public class Issue0369TestCase {
 
         private final Class<? extends List> implementationclass = ArrayList.class;
 
+        @Override
         public Class<? extends List> getComponentImplementation() {
             return implementationclass;
         }
 
+        @Override
         public Object getComponentKey() {
             return null;
         }
 
+        @Override
         public List getComponentInstance(final PicoContainer container, final Type into) throws PicoCompositionException {
             return null;
         }
 
+        @Override
         public void verify(final PicoContainer container) throws PicoCompositionException {
 
         }
 
+        @Override
         public void accept(final PicoVisitor visitor) {
 
         }
 
+        @Override
         public ComponentAdapter<List> getDelegate() {
             return null;
         }
 
-        public <U extends ComponentAdapter> U findAdapterOfType(final Class<U> adapterType) {
+        @Override
+        public <U extends ComponentAdapter<?>> U findAdapterOfType(final Class<U> adapterType) {
             return null;
         }
 
+        @Override
         public String getDescriptor() {
             return null;
         }

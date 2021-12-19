@@ -37,6 +37,7 @@ import static org.junit.Assert.assertTrue;
 public final class ParameterTestCase {
 
     public static class FooNameBinding implements NameBinding {
+        @Override
         public String getName() {
             return "";
         }

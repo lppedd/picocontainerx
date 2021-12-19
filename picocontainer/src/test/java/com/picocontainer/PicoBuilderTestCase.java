@@ -321,6 +321,7 @@ public class PicoBuilderTestCase {
         public CustomComponentFactory(final SomeContainerDependency someDependency) {
         }
 
+        @Override
         public ComponentAdapter createComponentAdapter(final ComponentMonitor monitor,
                                                        final LifecycleStrategy lifecycle,
                                                        final Properties componentProps,
@@ -330,13 +331,16 @@ public class PicoBuilderTestCase {
             return null;
         }
 
-		public void dispose() {
+		@Override
+    public void dispose() {
 			
 		}
         
+        @Override
         public void verify(final PicoContainer container) {
         }
 
+        @Override
         public void accept(final PicoVisitor visitor) {
             visitor.visitComponentFactory(this);
         }

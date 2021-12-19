@@ -16,6 +16,7 @@ import com.thoughtworks.paranamer.AdaptiveParanamer;
 import com.thoughtworks.paranamer.AnnotationParanamer;
 import com.thoughtworks.paranamer.CachingParanamer;
 import com.thoughtworks.paranamer.Paranamer;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
@@ -41,7 +42,7 @@ public abstract class MultiArgMemberInjector<T> extends AbstractInjector<T> {
 
     public MultiArgMemberInjector(final Object key,
                                 final Class<T> impl,
-                                final AccessibleObjectParameterSet[] parameters,
+                                final AccessibleObjectParameterSet @Nullable [] parameters,
                                 final ComponentMonitor monitor,
                                 final boolean useNames,
                                 final boolean useAllParameters

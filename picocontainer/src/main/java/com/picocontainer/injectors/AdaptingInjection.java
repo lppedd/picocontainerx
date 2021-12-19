@@ -85,7 +85,6 @@ public class AdaptingInjection extends AbstractInjectionType {
       final FieldParameters[] fieldParams,
       final MethodParameters[] methodParams) {
     verifyNamedParameters(impl, fieldParams, methodParams);
-
     componentProps.putAll(Characteristics.ALLOW_UNUSED_PARAMETERS);
 
     // Pico Style Injections
@@ -123,10 +122,10 @@ public class AdaptingInjection extends AbstractInjectionType {
     injectors.add(defaultInjectionAdapter(componentProps));
     Collections.reverse(injectors);
 
-    //return defaultInjectionAdapter(componentProps, monitor, lifecycle, key, impl, parameters);
+    // return defaultInjectionAdapter(componentProps, monitor, lifecycle, key, impl, parameters);
     final InjectionType[] aArray = injectors.toArray(new InjectionType[0]);
 
-    //Wrap the static injection behavior.
+    // Wrap the static injection behavior.
     final ComponentFactory caf = new CompositeInjection(aArray);
 
     final ComponentAdapter<T> result =
@@ -206,6 +205,7 @@ public class AdaptingInjection extends AbstractInjectionType {
 
   @Nullable
   private <T> InjectionType setterInjectionAdapter(final Properties componentProps) {
+    // noinspection SimplifiableIfStatement
     if (AbstractBehavior.removePropertiesIfPresent(componentProps, Characteristics.SDI)) {
       return setterInjection;
     }
@@ -215,6 +215,7 @@ public class AdaptingInjection extends AbstractInjectionType {
 
   @Nullable
   private <T> InjectionType methodInjectionAdapter(final Properties componentProps) {
+    // noinspection SimplifiableIfStatement
     if (AbstractBehavior.removePropertiesIfPresent(componentProps, Characteristics.METHOD_INJECTION)) {
       return methodInjection;
     }
@@ -224,6 +225,7 @@ public class AdaptingInjection extends AbstractInjectionType {
 
   @Nullable
   private <T> InjectionType methodAnnotatedInjectionAdapter(final Class<T> impl) {
+    // noinspection SimplifiableIfStatement
     if (injectionMethodAnnotated(impl)) {
       return annotatedMethodInjection;
     }
@@ -233,6 +235,7 @@ public class AdaptingInjection extends AbstractInjectionType {
 
   @Nullable
   private <T> InjectionType fieldAnnotatedInjectionAdapter(final Class<T> impl) {
+    // noinspection SimplifiableIfStatement
     if (injectionFieldAnnotated(impl)) {
       return annotatedFieldInjection;
     }
@@ -269,8 +272,8 @@ public class AdaptingInjection extends AbstractInjectionType {
 
   private boolean injectionAnnotated(final AccessibleObject[] objects) {
     for (final AccessibleObject object : objects) {
-      if (object.getAnnotation(Inject.class) != null
-          || object.getAnnotation(getInjectionAnnotation("javax.inject.Inject")) != null) {
+      if (object.getAnnotation(Inject.class) != null ||
+          object.getAnnotation(getInjectionAnnotation("javax.inject.Inject")) != null) {
         return true;
       }
     }

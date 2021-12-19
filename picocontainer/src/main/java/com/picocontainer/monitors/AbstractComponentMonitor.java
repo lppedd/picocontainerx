@@ -140,7 +140,7 @@ public class AbstractComponentMonitor implements ComponentMonitor, ComponentMoni
   }
 
   /**
-   * If the delegate supports a {@link ComponentMonitorStrategy}, this is used to changed
+   * If the delegate supports a {@link ComponentMonitorStrategy}, this is used to change
    * the monitor while keeping the same delegate. Else the delegate is replaced by the new monitor.
    */
   @Override

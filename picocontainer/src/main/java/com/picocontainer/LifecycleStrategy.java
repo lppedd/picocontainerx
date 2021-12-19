@@ -48,6 +48,7 @@ public interface LifecycleStrategy {
    * Test if a component instance has a lifecycle.
    *
    * @param type the component's type
+   *
    * @return {@code true} if the component has a lifecycle
    */
   boolean hasLifecycle(final Class<?> type);
@@ -57,7 +58,6 @@ public interface LifecycleStrategy {
    * or lazy (it will only start on the first {@code getComponent()})?
    * The default is the first of those two.
    *
-   * @param adapter
    * @return {@code true} if lazy, {@code false} if eager
    */
   boolean isLazy(final ComponentAdapter<?> adapter);

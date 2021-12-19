@@ -5,7 +5,7 @@ import com.picocontainer.Parameter;
 import java.io.Serializable;
 import java.util.Arrays;
 
-/***
+/**
  * Serialization warning: while using a specific target type is more of an edge case,
  * it isn't serializable and will have to be re-applied after deserialization.
  *
@@ -15,9 +15,7 @@ import java.util.Arrays;
 public class AccessibleObjectParameterSet implements Serializable {
   public static final AccessibleObjectParameterSet[] EMPTY = {};
 
-  /**
-   * Can't be serialized
-   */
+  // Can't be serialized
   private transient Class<?> targetType;
   private final Parameter[] params;
   private final String name;

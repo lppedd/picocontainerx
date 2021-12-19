@@ -12,6 +12,8 @@ package com.picocontainer;
 import com.picocontainer.parameters.ConstructorParameters;
 import com.picocontainer.parameters.FieldParameters;
 import com.picocontainer.parameters.MethodParameters;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Properties;
 
@@ -31,29 +33,25 @@ public interface ComponentFactory {
    * @param monitor the component monitor
    * @param lifecycle te lifecycle strategy
    * @param componentProps the component properties
-   * @param key the key to be associated with this adapter. This
-   * value should be returned from a call to
-   * {@link ComponentAdapter#getComponentKey()} on the created
-   * adapter.
-   * @param impl the implementation class to be associated
-   * with this adapter. This value should be returned from a call
-   * to {@link ComponentAdapter#getComponentImplementation()} on
-   * the created adapter. Should not be null.
+   * @param key the key to be associated with this adapter.
+   *     This value should be returned from a call to
+   *     {@link ComponentAdapter#getComponentKey()} on the created adapter
+   * @param impl the implementation class to be associated with this adapter.
+   *     This value should be returned from a call to {@link ComponentAdapter#getComponentImplementation()}
+   *     on the created adapter. Should not be null
    * @param constructorParams TODO
    * @param fieldParams TODO
    * @param methodParams TODO
-   * @return a new component adapter based on the specified arguments. Should
-   * not return null.
    */
-  <T> ComponentAdapter<T> createComponentAdapter(
+  @NotNull <T> ComponentAdapter<T> createComponentAdapter(
       final ComponentMonitor monitor,
       final LifecycleStrategy lifecycle,
       final Properties componentProps,
       final Object key,
       final Class<T> impl,
-      final ConstructorParameters constructorParams,
-      final FieldParameters[] fieldParams,
-      final MethodParameters[] methodParams
+      @Nullable final ConstructorParameters constructorParams,
+      @Nullable final FieldParameters @Nullable [] fieldParams,
+      @Nullable final MethodParameters @Nullable [] methodParams
   );
 
   /**
@@ -61,7 +59,7 @@ public interface ComponentFactory {
    *
    * @param container the {@link PicoContainer} that is used for verification.
    */
-  void verify(final PicoContainer container);
+  void verify(@NotNull final PicoContainer container);
 
   /**
    * Accepts a visitor for this {@code ComponentFactory}.
@@ -70,7 +68,7 @@ public interface ComponentFactory {
    *
    * @param visitor the visitor.
    */
-  void accept(final PicoVisitor visitor);
+  void accept(@NotNull final PicoVisitor visitor);
 
   void dispose();
 }

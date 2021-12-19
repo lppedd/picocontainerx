@@ -16,6 +16,7 @@ import com.picocontainer.PicoContainer;
 import com.picocontainer.PicoVisitor;
 import com.picocontainer.lifecycle.NullLifecycleStrategy;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
@@ -33,8 +34,7 @@ import java.util.Properties;
  * The method can accept parameters that PicoContainer will satisfy.
  * </p>
  */
-@SuppressWarnings("rawtypes")
-public class ProviderAdapter implements com.picocontainer.Injector, Provider, LifecycleStrategy {
+public class ProviderAdapter implements com.picocontainer.Injector<Object>, Provider, LifecycleStrategy {
   private static final Method AT_INJECT_GET = javax.inject.Provider.class.getDeclaredMethods()[0];
 
   private final Object provider;
@@ -115,22 +115,16 @@ public class ProviderAdapter implements com.picocontainer.Injector, Provider, Li
     this.provider = provider;
     provideMethod = getProvideMethod(provider.getClass());
     providerReturnType = determineProviderReturnType(provider);
-
-    if (providerKey == null) {
-      key = determineProviderReturnType(provider);
-    } else {
-      key = providerKey;
-    }
-
+    key = providerKey == null
+        ? determineProviderReturnType(provider)
+        : providerKey;
     setUseNames(useNames);
   }
 
   private void setUseNames(final boolean useNames) {
-    if (useNames) {
-      properties = Characteristics.USE_NAMES;
-    } else {
-      properties = Characteristics.NONE;
-    }
+    properties = useNames
+        ? Characteristics.USE_NAMES
+        : Characteristics.NONE;
   }
 
   protected boolean useNames() {
@@ -143,12 +137,10 @@ public class ProviderAdapter implements com.picocontainer.Injector, Provider, Li
   }
 
   @Override
-  public Class getComponentImplementation() {
-    if (provider instanceof javax.inject.Provider) {
-      return provider.getClass();
-    }
-
-    return (Class) key;
+  public Class<Object> getComponentImplementation() {
+    return provider instanceof javax.inject.Provider ?
+        (Class<Object>) provider.getClass()
+        : (Class<Object>) key;
   }
 
   public javax.inject.Provider<?> getProvider() {
@@ -183,7 +175,7 @@ public class ProviderAdapter implements com.picocontainer.Injector, Provider, Li
     }
 
     final Reinjector reinjector = new Reinjector(container);
-    return reinjector.reinject(key, provider.getClass(), provider, properties, new MethodInjection(provideMethod));
+    return reinjector.reInject(key, provider.getClass(), provider, properties, new MethodInjection(provideMethod));
   }
 
   public static Type determineProviderReturnType(final Object provider) {
@@ -191,12 +183,9 @@ public class ProviderAdapter implements com.picocontainer.Injector, Provider, Li
 
     if (provideMethod == AT_INJECT_GET) {
       final Type paramType = provider.getClass().getGenericInterfaces()[0];
-
-      if (paramType instanceof Class<?>) {
-        return paramType.getClass();
-      }
-
-      return ((ParameterizedType) paramType).getActualTypeArguments()[0];
+      return paramType instanceof Class<?>
+          ? paramType.getClass()
+          : ((ParameterizedType) paramType).getActualTypeArguments()[0];
     }
 
     return provideMethod.getReturnType();
@@ -238,7 +227,7 @@ public class ProviderAdapter implements com.picocontainer.Injector, Provider, Li
   }
 
   @Override
-  public void verify(final PicoContainer container) { }
+  public void verify(final PicoContainer container) {}
 
   @Override
   public void accept(final PicoVisitor visitor) {
@@ -251,7 +240,7 @@ public class ProviderAdapter implements com.picocontainer.Injector, Provider, Li
   @Nullable
   @Contract("-> null")
   @Override
-  public ComponentAdapter<?> getDelegate() {
+  public ComponentAdapter<Object> getDelegate() {
     return null;
   }
 
@@ -318,22 +307,16 @@ public class ProviderAdapter implements com.picocontainer.Injector, Provider, Li
   @Nullable
   @Contract("_, _, _, _ -> null")
   @Override
-  @SuppressWarnings("rawtypes")
   public Object partiallyDecorateComponentInstance(
       final PicoContainer container,
       final Type into,
       final Object instance,
-      final Class superclassPortion) {
+      final Class<?> superclassPortion) {
     return null;
   }
 
-  @Nullable
   @Override
-  public ComponentAdapter findAdapterOfType(final Class adapterType) {
-    if (getClass().isAssignableFrom(adapterType)) {
-      return this;
-    }
-
-    return null;
+  public <U extends ComponentAdapter<?>> U findAdapterOfType(final @NotNull Class<U> adapterType) {
+    return getClass().isAssignableFrom(adapterType) ? (U) this : null;
   }
 }

@@ -3,9 +3,7 @@
     <option name="myName" value="Project Default" />
     <inspection_tool class="AddOperatorModifier" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AddVarianceModifier" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="AnnotationClass" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="ArrayCanBeReplacedWithEnumValues" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="AssignmentToCatchBlockParameter" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AssignmentToForLoopParameter" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_checkForeachParameters" value="true" />
     </inspection_tool>
@@ -32,9 +30,6 @@
     <inspection_tool class="CloneCallsConstructors" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="CloneInNonCloneableClass" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="CloneReturnsClassType" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="CloneableImplementsClone" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="m_ignoreCloneableDueToInheritance" value="true" />
-    </inspection_tool>
     <inspection_tool class="ComparisonOfShortAndChar" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="ComplexRedundantLet" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="ConfusingElse" enabled="true" level="WARNING" enabled_by_default="true">
@@ -75,7 +70,6 @@
     <inspection_tool class="Finalize" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoreTrivialFinalizers" value="true" />
     </inspection_tool>
-    <inspection_tool class="FinalizeNotProtected" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="FoldInitializerAndIfToElvis" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="FromClosedRangeMigration" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="FunctionWithLambdaExpressionBody" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -84,6 +78,37 @@
       <option name="insideTryAllowed" value="false" />
     </inspection_tool>
     <inspection_tool class="HtmlTagCanBeJavadocTag" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="HttpUrlsUsage" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredUrls">
+        <list>
+          <option value="http://localhost" />
+          <option value="http://127.0.0.1" />
+          <option value="http://0.0.0.0" />
+          <option value="http://www.w3.org/" />
+          <option value="http://json-schema.org/draft" />
+          <option value="http://java.sun.com/" />
+          <option value="http://xmlns.jcp.org/" />
+          <option value="http://javafx.com/javafx/" />
+          <option value="http://javafx.com/fxml" />
+          <option value="http://maven.apache.org/xsd/" />
+          <option value="http://maven.apache.org/POM/" />
+          <option value="http://www.springframework.org/schema/" />
+          <option value="http://www.springframework.org/tags" />
+          <option value="http://www.springframework.org/security/tags" />
+          <option value="http://www.thymeleaf.org" />
+          <option value="http://www.jboss.org/j2ee/schema/" />
+          <option value="http://www.jboss.com/xml/ns/" />
+          <option value="http://www.ibm.com/webservices/xsd" />
+          <option value="http://activemq.apache.org/schema/" />
+          <option value="http://schema.cloudfoundry.org/spring/" />
+          <option value="http://schemas.xmlsoap.org/" />
+          <option value="http://cxf.apache.org/schemas/" />
+          <option value="http://primefaces.org/ui" />
+          <option value="http://tiles.apache.org/" />
+          <option value="http://picocontainer.org" />
+        </list>
+      </option>
+    </inspection_tool>
     <inspection_tool class="IOResource" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredTypesString" value="java.io.ByteArrayOutputStream,java.io.ByteArrayInputStream,java.io.StringBufferInputStream,java.io.CharArrayWriter,java.io.CharArrayReader,java.io.StringWriter,java.io.StringReader" />
       <option name="insideTryAllowed" value="false" />
@@ -128,7 +153,6 @@
     </inspection_tool>
     <inspection_tool class="MissortedModifiers" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_requireAnnotationsFirst" value="true" />
-      <option name="typeUseWithType" value="true" />
     </inspection_tool>
     <inspection_tool class="MoveFieldAssignmentToInitializer" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="MoveLambdaOutsideParentheses" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -141,6 +165,16 @@
     <inspection_tool class="NoopMethodInAbstractClass" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="NullChecksToSafeCall" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="NullableBooleanElvis" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="NullableProblems" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="REPORT_NULLABLE_METHOD_OVERRIDES_NOTNULL" value="true" />
+      <option name="REPORT_NOT_ANNOTATED_METHOD_OVERRIDES_NOTNULL" value="false" />
+      <option name="REPORT_NOTNULL_PARAMETER_OVERRIDES_NULLABLE" value="true" />
+      <option name="REPORT_NOT_ANNOTATED_PARAMETER_OVERRIDES_NOTNULL" value="true" />
+      <option name="REPORT_NOT_ANNOTATED_GETTER" value="true" />
+      <option name="REPORT_NOT_ANNOTATED_SETTER_PARAMETER" value="true" />
+      <option name="REPORT_ANNOTATION_NOT_PROPAGATED_TO_OVERRIDERS" value="false" />
+      <option name="REPORT_NULLS_PASSED_TO_NON_ANNOTATED_METHOD" value="true" />
+    </inspection_tool>
     <inspection_tool class="ObjectLiteralToLambda" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="ObjectsEqualsCanBeSimplified" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="ObsoleteCollection" enabled="true" level="WARNING" enabled_by_default="true">
@@ -159,7 +193,6 @@
     <inspection_tool class="ProhibitTypeParametersForLocalVariablesMigration" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="ProhibitUseSiteTargetAnnotationsOnSuperTypesMigration" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="ProtectedInFinal" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ProtectedMemberInFinalClass" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="PublicApiImplicitType" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="PublicConstructorInNonPublicClass" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="RawTypeCanBeGeneric" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -227,10 +260,7 @@
     <inspection_tool class="ReturnSeparatedFromComputation" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="SafeCastWithReturn" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="SerializableCtor" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="SerializableHasSerialVersionUIDField" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="ignoreAnonymousInnerClasses" value="false" />
-      <option name="superClassString" value="java.awt.Component" />
-    </inspection_tool>
+    <inspection_tool class="SerializableHasSerialVersionUIDField" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="SimplifiableAnnotation" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="SimplifiableCall" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="SimplifiableCallChain" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -262,6 +292,13 @@
           <option value="TypeMayBeWeakened" />
           <option value="rawtypes" />
           <option value="unchecked" />
+          <option value="InterfaceMayBeAnnotatedFunctional" />
+          <option value="MarkerInterface" />
+          <option value="RedundantInterfaceDeclaration" />
+          <option value="EqualsWhichDoesntCheckParameterClass" />
+          <option value="UseOfSystemOutOrSystemErr" />
+          <option value="UnnecessaryLocalVariable" />
+          <option value="NoopMethodInAbstractClass" />
         </list>
       </option>
     </inspection_tool>
@@ -284,7 +321,7 @@
       <option name="doNotWeakenToJavaLangObject" value="true" />
       <option name="onlyWeakentoInterface" value="true" />
       <option name="doNotWeakenInferredVariableType" value="true" />
-      <stopClasses>java.util.Collection,com.intellij.psi.PsiMethodCallExpression,com.intellij.psi.PsiVariable,com.intellij.psi.PsiExpressionList,com.intellij.psi.PsiReferenceExpression,java.util.Properties</stopClasses>
+      <stopClasses>java.util.Collection,com.intellij.psi.PsiMethodCallExpression,com.intellij.psi.PsiVariable,com.intellij.psi.PsiExpressionList,com.intellij.psi.PsiReferenceExpression,java.util.Properties,java.lang.Class,java.lang.reflect.Field,com.picocontainer.MutablePicoContainer,com.picocontainer.classname.ClassName,java.util.List</stopClasses>
     </inspection_tool>
     <inspection_tool class="UNCHECKED_WARNING" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="IGNORE_UNCHECKED_ASSIGNMENT" value="false" />
@@ -298,7 +335,7 @@
     </inspection_tool>
     <inspection_tool class="UnnecessarilyQualifiedStaticUsage" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_ignoreStaticFieldAccesses" value="false" />
-      <option name="m_ignoreStaticMethodCalls" value="false" />
+      <option name="m_ignoreStaticMethodCalls" value="true" />
       <option name="m_ignoreStaticAccessFromStaticContext" value="false" />
     </inspection_tool>
     <inspection_tool class="UnnecessarilyQualifiedStaticallyImportedElement" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -336,7 +373,7 @@
     <inspection_tool class="UseWithIndex" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="WarningOnMainUnusedParameterMigration" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="WhenWithOnlyElse" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="unused" enabled="false" level="WARNING" enabled_by_default="false">
+    <inspection_tool class="unused" enabled="false" level="WARNING" enabled_by_default="false" checkParameterExcludingHierarchy="false">
       <option name="LOCAL_VARIABLE" value="true" />
       <option name="FIELD" value="true" />
       <option name="METHOD" value="true" />

@@ -10,6 +10,7 @@ package com.picocontainer.lifecycle;
 import com.picocontainer.ComponentMonitor;
 import com.picocontainer.PicoLifecycleException;
 import com.picocontainer.injectors.AnnotationInjectionUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -29,9 +30,10 @@ import java.util.Set;
 public final class JavaEE5LifecycleStrategy extends AbstractMonitoringLifecycleStrategy {
   /**
    * @param monitor the monitor to use
+   *
    * @throws NullPointerException if the monitor is {@code null}
    */
-  public JavaEE5LifecycleStrategy(final ComponentMonitor monitor) {
+  public JavaEE5LifecycleStrategy(@NotNull final ComponentMonitor monitor) {
     super(monitor);
   }
 

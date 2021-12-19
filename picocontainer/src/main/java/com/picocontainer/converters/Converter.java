@@ -7,11 +7,13 @@
  *****************************************************************************/
 package com.picocontainer.converters;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * @author Paul Hammant
  * @author Michael Rimov
  */
-@SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
+@FunctionalInterface
 public interface Converter<T> {
   /**
    * Performs a conversion between the given parameter value and the target type.
@@ -19,5 +21,5 @@ public interface Converter<T> {
    * @param parameterValue the string value to convert
    * @return the resulting object
    */
-  T convert(final String parameterValue);
+  T convert(@NotNull final String parameterValue);
 }

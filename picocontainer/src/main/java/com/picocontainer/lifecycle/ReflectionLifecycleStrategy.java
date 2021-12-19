@@ -16,6 +16,7 @@ import java.util.Map;
 
 /**
  * Reflection lifecycle strategy.
+ * <p>
  * Starts, stops, disposes of component if appropriate methods are present.
  * The component may implement only one of the three methods.
  *
@@ -53,10 +54,6 @@ public class ReflectionLifecycleStrategy extends AbstractMonitoringLifecycleStra
    */
   private final transient Map<Class<?>, Method[]> methodMap = new HashMap<>();
 
-  /**
-   * @param monitor the monitor to use
-   * @throws NullPointerException if the monitor is {@code null}
-   */
   public ReflectionLifecycleStrategy(final ComponentMonitor monitor) {
     this(monitor, "start", "stop", "dispose");
   }
@@ -152,6 +149,7 @@ public class ReflectionLifecycleStrategy extends AbstractMonitoringLifecycleStra
    * Initializes the method array with the given type.
    *
    * @param type the type to examine for reflection lifecycle methods.
+   *
    * @return Method array containing start/stop/dispose methods.
    */
   private Method[] init(final Class<?> type) {

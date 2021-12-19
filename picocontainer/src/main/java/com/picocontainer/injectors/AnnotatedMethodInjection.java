@@ -63,8 +63,9 @@ public class AnnotatedMethodInjection extends AbstractInjectionType {
      *             be solved or if the implementation is an interface or an
      *             abstract class.
      */
+    @Override
     public <T> ComponentAdapter<T> createComponentAdapter(final ComponentMonitor monitor, final LifecycleStrategy lifecycle, final Properties componentProps,
-                                                   final Object key, final Class<T> impl, final ConstructorParameters constructorParams, final FieldParameters[] fieldParams, final MethodParameters[] methodParams)
+                                                          final Object key, final Class<T> impl, final ConstructorParameters constructorParams, final FieldParameters[] fieldParams, final MethodParameters[] methodParams)
             throws PicoCompositionException {
 
 

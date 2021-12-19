@@ -44,12 +44,15 @@ public class ComponentAdapterTestCase {
             super(key, impl);
         }
 
+        @Override
         public T getComponentInstance(final PicoContainer container, final Type into) throws PicoCompositionException {
             return null;
         }
+        @Override
         public void verify(final PicoContainer container) throws PicoVerificationException {
         }
 
+        @Override
         public String getDescriptor() {
             return TestAdapter.class.getName() + ":" ;
         }
@@ -61,9 +64,11 @@ public class ComponentAdapterTestCase {
             super(null, null, monitor);
         }
 
+        @Override
         public T getComponentInstance(final PicoContainer container, final Type into) throws PicoCompositionException {
             return null;
         }
+        @Override
         public void verify(final PicoContainer container) throws PicoVerificationException {
         }
         @Override
@@ -78,6 +83,7 @@ public class ComponentAdapterTestCase {
 		public void accept(final PicoVisitor visitor) {
         }
 
+        @Override
         public String getDescriptor() {
             return null;
         }

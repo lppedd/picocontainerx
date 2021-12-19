@@ -23,6 +23,7 @@ import com.picocontainer.parameters.ComponentParameter;
 import com.picocontainer.parameters.ConstructorParameters;
 import com.picocontainer.parameters.FieldParameters;
 import com.picocontainer.parameters.MethodParameters;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,9 +39,12 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * This {@link ComponentAdapter} will instantiate a new object for each call to
  * {@link ComponentAdapter#getComponentInstance(PicoContainer, Type)}.
+ * <p>
  * That means that when used with a PicoContainer, {@link PicoContainer#getComponent} will
  * return a new object each time.
  *
@@ -73,14 +77,15 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
    * @param impl the concrete implementation
    * @param monitor the component monitor used by this ComponentAdapter
    * @param parameters the parameters to use for the initialization
+   *
    * @throws NotConcreteRegistrationException if the implementation is not
-   * a concrete class
+   *     a concrete class
    * @throws NullPointerException if one of the parameters is {@code null}
    */
   protected AbstractInjector(
-      final Object key,
-      final Class<?> impl,
-      final ComponentMonitor monitor,
+      @NotNull final Object key,
+      @NotNull final Class<T> impl,
+      @NotNull final ComponentMonitor monitor,
       final boolean useNames,
       final AccessibleObjectParameterSet... parameters) {
     super(key, impl, monitor);
@@ -89,17 +94,13 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
 
     if (parameters != null) {
       for (int i = 0; i < parameters.length; i++) {
-        if (parameters[i] == null) {
-          throw new NullPointerException("Parameter " + i + " is null");
-        }
+        requireNonNull(parameters[i], "Parameter " + i + " cannot be null");
 
-        if (parameters[i].getParams() != null) {
-          final Parameter[] nestedParams = parameters[i].getParams();
+        final Parameter[] nestedParameters = parameters[i].getParams();
 
-          for (int j = 0; j < nestedParams.length; j++) {
-            if (nestedParams[j] == null) {
-              throw new NullPointerException("Parameter " + j + " inside " + parameters[i] + " is null");
-            }
+        if (nestedParameters != null) {
+          for (int j = 0; j < nestedParameters.length; j++) {
+            requireNonNull(nestedParameters[j], "Parameter " + j + " inside " + parameters[i] + " cannot be null");
           }
         }
       }
@@ -108,13 +109,16 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
     this.parameters = parameters;
   }
 
-  protected static AccessibleObjectParameterSet[] toAccessibleObjectParameterSetArray(final AccessibleObjectParameterSet singleParam) {
+  protected static AccessibleObjectParameterSet[] toAccessibleObjectParameterSetArray(
+      @Nullable final AccessibleObjectParameterSet singleParam) {
     // noinspection SimplifiableIfStatement
     if (singleParam == null) {
       return AccessibleObjectParameterSet.EMPTY;
     }
 
-    return new AccessibleObjectParameterSet[]{singleParam};
+    return new AccessibleObjectParameterSet[]{
+        singleParam
+    };
   }
 
   public boolean useNames() {
@@ -122,7 +126,7 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
   }
 
   private void checkConcrete() {
-    // Assert that the component class is concrete.
+    // Assert that the component class is concrete
     final boolean isAbstract = (getComponentImplementation().getModifiers() & Modifier.ABSTRACT) == Modifier.ABSTRACT;
 
     if (getComponentImplementation().isInterface() || isAbstract) {
@@ -130,6 +134,7 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
     }
   }
 
+  @NotNull
   protected Parameter[] createDefaultParameters(final AccessibleObject member) {
     int length = 0;
 
@@ -146,6 +151,7 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
     return createDefaultParameters(length);
   }
 
+  @Contract("_ -> fail")
   public static void throwUnknownAccessibleObjectType(final AccessibleObject member) {
     throw new IllegalArgumentException(
         "Object " + member + " doesn't appear to be a constructor, a field, or a method.  Don't know how to proceed."
@@ -156,8 +162,10 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
    * Create default parameters for the given types.
    *
    * @param length parameter list length
+   *
    * @return the array with the default parameters.
    */
+  @NotNull
   protected Parameter[] createDefaultParameters(final int length) {
     final Parameter[] componentParameters = new Parameter[length];
 
@@ -204,7 +212,7 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
   @NotNull
   protected Parameter[] createDefaultParamsBasedOnTypeOfAccessibleObject(final AccessibleObject object) {
     if (object instanceof Constructor) {
-      return createDefaultParameters(((Constructor) object).getParameterTypes().length);
+      return createDefaultParameters(((Constructor<?>) object).getParameterTypes().length);
     }
 
     if (object instanceof Field) {
@@ -231,7 +239,7 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
   /**
    * @return {@code null} if no parameter set for the given accessible object has been defined.
    */
-  @Nullable
+  @NotNull
   protected final AccessibleObjectParameterSet getParameterToUseForObject(
       final AccessibleObject targetInjectionMember,
       final AccessibleObjectParameterSet... assignedParameters) {
@@ -264,8 +272,9 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
   }
 
   /**
-   * Retrieves the enclosing class of the accessible object. (Constructor, Method, and Field all
-   * supply the method "getDeclaringClass()", yet it isn't supplied in the AccessibleObject base class.
+   * Retrieves the enclosing class of the accessible object.
+   * Constructor, Method, and Field all supply the method "getDeclaringClass()",
+   * yet it isn't supplied in the AccessibleObject base class.
    *
    * @return the enclosing type of the accessible object.
    */
@@ -280,7 +289,7 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
     } catch (final NoSuchMethodException e) {
       throw new PicoCompositionException(
           "Target Type '" + targetAccessibleObject.getClass()
-              + "' does not appear to suppot getDeclaringClass(). "
+              + "' does not appear to support getDeclaringClass(). "
               + "Please override getAccessibleObjectDefiningType() for your type of injection",
           e
       );
@@ -312,7 +321,7 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
     } catch (final NoSuchMethodException e) {
       throw new PicoCompositionException(
           "Target Type '" + targetAccessibleObject.getClass()
-              + "' does not appear to suppot getName(). "
+              + "' does not appear to support getName(). "
               + "Please override getAccessibleObjectDefiningType() for your type of injection",
           e
       );
@@ -324,8 +333,11 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
     }
   }
 
+  @SuppressWarnings("NoopMethodInAbstractClass")
   @Override
-  public void verify(final PicoContainer container) {}
+  public void verify(final PicoContainer container) {
+    //
+  }
 
   @Override
   public abstract T getComponentInstance(PicoContainer container, Type into);
@@ -371,6 +383,7 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
    *
    * @param constructor the constructor to use
    * @param parameters the parameters for the constructor
+   *
    * @return the new object.
    */
   protected T newInstance(final Constructor<? extends T> constructor, final Object[] parameters)
@@ -497,6 +510,7 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
    * Returns {@code true} if all fields are static members
    *
    * @param fieldsToInject list of fields/methods to be injected
+   *
    * @return {@code true} if all members are static
    */
   protected boolean isStaticInjection(final Member... fieldsToInject) {
@@ -547,7 +561,7 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
      * to observe for a dependency cycle.
      *
      * @return a value, if the functionality result in an expression,
-     * otherwise just return {@code null}
+     *     otherwise just return {@code null}
      */
     public abstract T run(Object instance);
 
@@ -557,6 +571,7 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
      * will be  thrown.
      *
      * @param stackFrame the current stack frame
+     *
      * @return the result of the {@code run} method
      */
     public final T observe(final Class<?> stackFrame, final Object instance) {
@@ -582,24 +597,19 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
   }
 
   public static class CyclicDependencyException extends PicoCompositionException {
-    private final List<Class> stack;
+    private final List<Class<?>> stack;
 
-    /**
-     *
-     */
-    public CyclicDependencyException(final Class<?> element) {
+    public CyclicDependencyException(@NotNull final Class<?> element) {
       super((Throwable) null);
       stack = new LinkedList<>();
       push(element);
     }
 
-    /**
-     *
-     */
-    public void push(final Class<?> element) {
+    public void push(@NotNull final Class<?> element) {
       stack.add(element);
     }
 
+    @NotNull
     public Class<?>[] getDependencies() {
       return stack.toArray(new Class[0]);
     }
@@ -631,10 +641,10 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
     private int parameterNumber = -1;
 
     /**
-     * Construct a new exception with the ambigous class type and the ambiguous component keys.
+     * Construct a new exception with the ambiguous class type and the ambiguous component keys.
      *
      * @param ambiguousDependency the unresolved dependency type
-     * @param keys the ambiguous keys.
+     * @param keys the ambiguous keys
      */
     public AmbiguousComponentResolutionException(final Generic<?> ambiguousDependency, final Object[] keys) {
       super("");
@@ -680,10 +690,9 @@ public abstract class AbstractInjector<T> extends AbstractAdapter<T> implements 
         msg.append(" through : <unknown>");
       }
 
-      //msg.append(accessibleObject != null ? accessibleObject : "<unknown>");
-      msg.append("', but there are too many choices to inject. These:");
+      msg.append("', but there are too many choices to inject. These: ");
       msg.append(Arrays.asList(getAmbiguousComponentKeys()));
-      msg.append(", refer http://picocontainer.org/ambiguous-injectable-help.html");
+      msg.append(", refer to http://picocontainer.org/ambiguous-injectable-help.html");
       return msg.toString();
     }
 

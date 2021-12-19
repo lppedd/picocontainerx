@@ -41,14 +41,17 @@ public final class UserQuestionTestCase {
             this.bla = cheeseMap;
         }
 
+        @Override
         @SuppressWarnings("unchecked")
         public T getComponentInstance(final PicoContainer pico, final Type into) throws PicoCompositionException {
             return (T) bla.get("cheese");
         }
 
+        @Override
         public void verify(final PicoContainer pico) {
         }
 
+        @Override
         public String getDescriptor() {
             return null;
         }

@@ -20,13 +20,13 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class NullLifecycleStrategy implements LifecycleStrategy, Serializable {
   @Override
-  public void start(final Object component) { }
+  public void start(final Object component) {}
 
   @Override
-  public void stop(final Object component) { }
+  public void stop(final Object component) {}
 
   @Override
-  public void dispose(final Object component) { }
+  public void dispose(final Object component) {}
 
   @Override
   public boolean hasLifecycle(final Class<?> type) {

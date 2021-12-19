@@ -19,6 +19,7 @@ import com.picocontainer.PicoContainer;
 import com.picocontainer.lifecycle.NullLifecycleStrategy;
 import com.picocontainer.monitors.NullComponentMonitor;
 import com.picocontainer.parameters.MethodParameters;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,7 +28,7 @@ import java.security.PrivilegedAction;
 import java.util.Properties;
 
 /**
- * A Reinjector allows methods on pre-instantiated classes to be invoked,
+ * A Re-injector allows methods on pre-instantiated classes to be invoked,
  * with appropriately scoped parameters.
  */
 public class Reinjector {
@@ -38,73 +39,75 @@ public class Reinjector {
   private final ComponentMonitor monitor;
 
   /**
-   * Make a reinjector with a parent container from which to pull components to be reinjected to.
-   * With this constructor, a {@link NullComponentMonitor} is used.
+   * Make a re-injector with a parent container from which to pull components to be re-injected to.
+   * With this constructor, a NullComponentMonitor is used.
    *
-   * @param parentContainer the parent container
+   * @param parent the parent container
    */
-  public Reinjector(final PicoContainer parentContainer) {
+  public Reinjector(@NotNull final PicoContainer parent) {
     this(
-        parentContainer,
-        parentContainer instanceof ComponentMonitorStrategy
-            ? ((ComponentMonitorStrategy) parentContainer).currentMonitor()
+        parent,
+        parent instanceof ComponentMonitorStrategy
+            ? ((ComponentMonitorStrategy) parent).currentMonitor()
             : new NullComponentMonitor()
     );
   }
 
   /**
-   * Make a reinjector with a parent container from which to pull components to be reinjected to.
+   * Make a re-injector with a parent container from which to pull components to be re-injected to.
    *
-   * @param parentContainer the parent container
+   * @param parent the parent container
    * @param monitor the monitor to use for 'instantiating' events
    */
-  public Reinjector(final PicoContainer parentContainer, final ComponentMonitor monitor) {
-    parent = parentContainer;
+  public Reinjector(@NotNull final PicoContainer parent, final ComponentMonitor monitor) {
+    this.parent = parent;
     this.monitor = monitor;
   }
 
   /**
-   * Reinjecting into a method.
+   * Re-injecting into a method.
    *
    * @param key the component-key from the parent set of components to inject into
-   * @param reinjectionMethod the reflection method to use for injection.
-   * @return the result of the reinjection-method invocation.
+   * @param reInjectionMethod the reflection method to use for injection
+   *
+   * @return the result of the re-injection method invocation
    */
-  public Object reinject(final Class<?> key, final Method reinjectionMethod) {
-    return reinject(
+  public Object reInject(final Class<?> key, final Method reInjectionMethod) {
+    return reInject(
         key,
         key,
         parent.getComponentInto(Generic.get(key), NOTHING.class),
         NO_PROPERTIES,
-        new MethodInjection(reinjectionMethod)
+        new MethodInjection(reInjectionMethod)
     );
   }
 
   /**
-   * Reinjecting into a method.
+   * Re-injecting into a method.
    *
    * @param key the component-key from the parent set of components to inject into
-   * @param reinjectionMethodEnum the enum for the reflection method to use for injection.
-   * @return the result of the reinjection-method invocation.
+   * @param reInjectionMethodEnum the enum for the reflection method to use for injection.
+   *
+   * @return the result of the re-injection method invocation
    */
-  public Object reinject(final Class<?> key, final Enum<?> reinjectionMethodEnum) {
-    return reinject(
+  public Object reInject(final Class<?> key, final Enum<?> reInjectionMethodEnum) {
+    return reInject(
         key,
         key,
         parent.getComponentInto(Generic.get(key), NOTHING.class),
         NO_PROPERTIES,
-        new MethodInjection(toMethod(reinjectionMethodEnum))
+        new MethodInjection(toMethod(reInjectionMethodEnum))
     );
   }
 
-  private Method toMethod(final Enum<?> reinjectionMethodEnum) {
+  private Method toMethod(final Enum<?> reInjectionMethodEnum) {
     final Object methodOrException = AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
       try {
-        return reinjectionMethodEnum.getClass().getMethod("toMethod").invoke(reinjectionMethodEnum);
+        return reInjectionMethodEnum.getClass().getMethod("toMethod").invoke(reInjectionMethodEnum);
       } catch (final IllegalAccessException e) {
-        return new PicoCompositionException("Illegal access to " + reinjectionMethodEnum.name());
+        return new PicoCompositionException("Illegal access to " + reInjectionMethodEnum.name());
       } catch (final InvocationTargetException e) {
-        return new PicoCompositionException("Invocation Target Exception " + reinjectionMethodEnum.name(), e.getCause());
+        return new PicoCompositionException("Invocation Target Exception " + reInjectionMethodEnum.name(), e.getCause());
       } catch (final NoSuchMethodException e) {
         return new PicoCompositionException("Expected generated method toMethod() on enum");
       }
@@ -118,76 +121,79 @@ public class Reinjector {
   }
 
   /**
-   * Reinjecting into a method.
+   * Re-injecting into a method.
    *
    * @param key the component-key from the parent set of components to inject into (key and impl are the same)
-   * @param reinjectionType the InjectionFactory to use for reinjection.
-   * @return the result of the reinjection-method invocation.
+   * @param reInjectionType the InjectionFactory to use for re-injection
+   *
+   * @return the result of the re-injection method invocation
    */
-  public Object reinject(final Class<?> key, final InjectionType reinjectionType) {
-    return reinject(
+  public Object reInject(final Class<?> key, final InjectionType reInjectionType) {
+    return reInject(
         key,
         key,
         parent.getComponentInto(Generic.get(key), NOTHING.class),
         NO_PROPERTIES,
-        reinjectionType
+        reInjectionType
     );
   }
 
   /**
-   * Reinjecting into a method.
+   * Re-injecting into a method.
    *
    * @param key the component-key from the parent set of components to inject into
-   * @param impl the implementation of the component that is going to result.
-   * @param reinjectionType the InjectionFactory to use for reinjection.
+   * @param impl the implementation of the component that is going to result
+   * @param reInjectionType the InjectionFactory to use for re-injection
    */
-  public Object reinject(final Class<?> key, final Class<?> impl, final InjectionType reinjectionType) {
-    return reinject(
+  public Object reInject(final Class<?> key, final Class<?> impl, final InjectionType reInjectionType) {
+    return reInject(
         key,
         impl,
         parent.getComponentInto(key, NOTHING.class),
         NO_PROPERTIES,
-        reinjectionType
+        reInjectionType
     );
   }
 
   /**
-   * Reinjecting into a method.
+   * Re-injecting into a method.
    *
    * @param key the component-key from the parent set of components to inject into
-   * @param implementation the implementation of the component that is going to result.
+   * @param implementation the implementation of the component that is going to result
    * @param instance the object that has the provider method to be invoked
-   * @param reinjectionType the InjectionFactory to use for reinjection.
-   * @return the result of the reinjection-method invocation.
+   * @param reInjectionType the InjectionFactory to use for re-injection
+   *
+   * @return the result of the re-injection method invocation
    */
-  public Object reinject(
+  public Object reInject(
       final Class<?> key,
       final Class<?> implementation,
       final Object instance,
-      final InjectionType reinjectionType) {
-    return reinject(key, implementation, instance, NO_PROPERTIES, reinjectionType);
+      final InjectionType reInjectionType) {
+    return reInject(key, implementation, instance, NO_PROPERTIES, reInjectionType);
   }
 
   /**
-   * Reinjecting into a method.
+   * Re-injecting into a method.
    *
    * @param key the component-key from the parent set of components to inject into
-   * @param implementation the implementation of the component that is going to result.
+   * @param implementation the implementation of the component that is going to result
    * @param instance the object that has the provider method to be invoked
-   * @param properties for reinjection
-   * @param reinjectionType the InjectionFactory to use for reinjection.
-   * @return the result of the reinjection-method invocation.
+   * @param properties for re-injection
+   * @param reInjectionType the InjectionFactory to use for re-injection
+   *
+   * @return the result of the re-injection method invocation
    */
-  public Object reinject(
+  public Object reInject(
       final Object key,
       final Class<?> implementation,
       final Object instance,
       final Properties properties,
-      final InjectionType reinjectionType,
+      final InjectionType reInjectionType,
       final MethodParameters... methodParams) {
-    final Reinjection reinjection = new Reinjection(reinjectionType, parent);
-    final com.picocontainer.Injector injector =
-        (com.picocontainer.Injector) reinjection.createComponentAdapter(
+    final Reinjection reInjection = new Reinjection(reInjectionType, parent);
+    final com.picocontainer.Injector<Object> injector =
+        (com.picocontainer.Injector<Object>) reInjection.createComponentAdapter(
             monitor,
             NO_LIFECYCLE,
             properties,

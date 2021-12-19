@@ -8,27 +8,25 @@
 package com.picocontainer;
 
 import com.picocontainer.behaviors.Caching.Cached;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 
 /**
+ * A component adapter is responsible for providing a specific component instance of type {@code T}.
+ * An instance of an implementation of this interface is used inside a {@link PicoContainer}
+ * for every registered component or instance.
  * <p>
- * A component adapter is responsible for providing a specific component
- * instance of type &lt;T&gt;. An instance of an implementation of this interface is
- * used inside a {@link PicoContainer} for every registered component or
- * instance. Each {@code ComponentAdapter} instance has to have a key
- * which is unique within that container. The key itself is either a class type
- * (normally an interface) or an identifier.
- * </p>
+ * Each {@code ComponentAdapter} instance has to have a key which is unique within that container.
+ * The key itself is either a class type (normally an interface) or an identifier.
  * <p>
- * In a overly simplistic sense, the ComponentAdapter can be thought of us a type of
- * an object factory.  If you need to modify how your object is constructed, use and appropriate
- * ComponentAdapter or roll your own since the API is purposely kept rather simple.
- * </p>
+ * In an overly simplistic sense, the {@code ComponentAdapter} can be thought of as a type of object factory.
+ * If you need to modify how your object is constructed, use an appropriate
+ * {@code ComponentAdapter} or roll your own since the API is purposely kept rather simple.
  * <p>
  * See <a href="http://www.picocontainer.org/adapters.html">http://www.picocontainer.org/adapters.html</a>
  * for more information.
- * </p>
  *
  * @author Jon Tirs&eacute;n
  * @author Paul Hammant
@@ -43,77 +41,88 @@ public interface ComponentAdapter<T> {
    * Retrieve the key associated with the component.
    *
    * @return the component's key.
-   * Should either be a class type (normally an interface) or an identifier that is
-   * unique (within the scope of the current PicoContainer).
+   *     Should either be a class type (normally an interface) or an identifier that is
+   *     unique (within the scope of the current PicoContainer).
    */
+  @NotNull
   Object getComponentKey();
 
   /**
    * Retrieve the class of the component.
    *
    * @return the component's implementation class.
-   * Should normally be a concrete class (ie, a class that can be instantiated).
+   *     Should normally be a concrete class (ie, a class that can be instantiated).
    */
+  @NotNull
   Class<? extends T> getComponentImplementation();
 
   /**
    * Retrieve the component instance.
-   * This method will usually create a new instance each time it is called, but that is not required.
-   * For example, {@link Cached} will always return the same instance.
+   * <p>
+   * This method will usually create a new instance each time it is called,
+   * but that is not required. For example, {@link Cached} will always return the same instance.
    *
-   * @param container the {@link PicoContainer}, that is used to resolve any possible dependencies of the instance.
+   * @param container the {@link PicoContainer} that is used to resolve
+   *     any possible dependencies of the instance
    * @param into the class that is about to be injected into.
-   * Use {@code ComponentAdapter.NOTHING.class} if this is not important to you.
-   * @return the component instance.
+   *     Use {@link NOTHING#getClass()} if this is not important to you
    *
-   * @throws PicoCompositionException if the component has dependencies which could not be resolved, or
-   * instantiation of the component lead to an ambiguous situation within the
-   * container.
+   * @return the component instance
+   *
+   * @throws PicoCompositionException if the component has dependencies which could not be resolved,
+   *     or instantiation of the component lead to an ambiguous situation within the container
    */
-  T getComponentInstance(final PicoContainer container, final Type into);
+  @Nullable
+  T getComponentInstance(@NotNull final PicoContainer container, @NotNull final Type into);
 
   /**
    * Verify that all dependencies for this adapter can be satisfied.
    * Normally, the adapter should verify this by checking that the associated PicoContainer
    * contains all the needed dependencies.
    *
-   * @param container the {@link PicoContainer}, that is used to resolve any possible dependencies of the instance.
+   * @param container the {@link PicoContainer} that is used to resolve
+   *     any possible dependencies of the instance.
+   *
    * @throws PicoCompositionException if one or more dependencies cannot be resolved.
    */
-  void verify(final PicoContainer container);
+  void verify(@NotNull final PicoContainer container);
 
   /**
-   * Accepts a visitor for this ComponentAdapter.
+   * Accepts a visitor for this {@code ComponentAdapter}.
    * The method is normally called by visiting a {@link PicoContainer},
-   * that cascades the visitor also down to all its ComponentAdapter instances.
+   * that cascades the visitor also down to all its {@code ComponentAdapter} instances.
    *
-   * @param visitor the visitor.
+   * @param visitor the visitor
    */
-  void accept(final PicoVisitor visitor);
+  void accept(@NotNull final PicoVisitor visitor);
 
   /**
-   * Component adapters may be nested in a chain, and this method is used to grab the next ComponentAdapter in the
-   * chain.
+   * Component adapters may be nested in a chain, and this method is used to grab
+   * the next {@code ComponentAdapter} in the chain.
    *
-   * @return the next component adapter in line or null if there is no delegate ComponentAdapter.
+   * @return the next {@code ComponentAdapter} in line
+   *     or {@code null} if there is no delegate {@code ComponentAdapter}.
    */
+  @Nullable
   ComponentAdapter<T> getDelegate();
 
   /**
-   * Locates a component adapter of type <em>componentAdapterType</em> in the {@code ComponentAdapter} chain.
-   * Will return null if there is no adapter of the given type.
+   * Locates a component adapter of type {@code adapterType} in the {@code ComponentAdapter} chain.
+   * Will return {@code null} if there is no adapter of the given type.
    *
-   * @param <U> the type of ComponentAdapter being located.
-   * @param adapterType the class of the adapter type being located. Never {@code null}.
-   * @return the appropriate component adapter of type <em>U</em>.
-   * May return null if the component adapter type is not returned.
+   * @param <U> the type of {@code ComponentAdapter} being located
+   * @param adapterType the class of the adapter type being located
+   *
+   * @return the appropriate component adapter of type {@code U}.
+   *     May return {@code null} if the component adapter type is not returned
    */
-  <U extends ComponentAdapter> U findAdapterOfType(final Class<U> adapterType);
+  @Nullable <U extends ComponentAdapter<?>> U findAdapterOfType(@NotNull final Class<U> adapterType);
 
   /**
-   * Get a string key descriptor of the component adapter for use in toString()
+   * Get a string key descriptor of the component adapter.
    *
    * @return the descriptor
    */
+  @NotNull
   String getDescriptor();
 }

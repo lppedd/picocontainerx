@@ -43,12 +43,6 @@ import com.picocontainer.PicoContainer;
 import com.picocontainer.behaviors.Caching;
 import com.picocontainer.containers.EmptyPicoContainer;
 import com.picocontainer.containers.TransientPicoContainer;
-import com.picocontainer.injectors.AbstractInjectionType;
-import com.picocontainer.injectors.AnnotatedMethodInjection;
-import com.picocontainer.injectors.ConstructorInjection;
-import com.picocontainer.injectors.MethodInjection;
-import com.picocontainer.injectors.Reinjection;
-import com.picocontainer.injectors.Reinjector;
 import com.picocontainer.monitors.NullComponentMonitor;
 
 @RunWith(JMock.class)
@@ -270,7 +264,7 @@ public class ReinjectionTestCase extends AbstractComponentFactoryTest {
                     with(any(Method.class)), with(any(Object.class)), with(any(Long.class)), with(any(Integer.class)), with(any(Object[].class)));
         }});
 
-        Object o = reinjector.reinject(NeedsShoe.class, methodInjection);
+        Object o = reinjector.reInject(NeedsShoe.class, methodInjection);
         int result = (Integer) o;
         assertEquals(6, result);
 
@@ -291,8 +285,8 @@ public class ReinjectionTestCase extends AbstractComponentFactoryTest {
         Reinjector reinjector = new Reinjector(parent, cm);
 
         //int result = (Integer) reinjector.reinject(NeedsShoe.class, DOIT_METHOD);
-        assertEquals(6, (int) (Integer) reinjector.reinject(NeedsShoe.class, DOIT_METHOD));
-        assertEquals(6, (int) (Integer) reinjector.reinject(NeedsShoe.class, new MethodInjection(DOIT_METHOD)));
+        assertEquals(6, (int) (Integer) reinjector.reInject(NeedsShoe.class, DOIT_METHOD));
+        assertEquals(6, (int) (Integer) reinjector.reInject(NeedsShoe.class, new MethodInjection(DOIT_METHOD)));
 
     }
 
@@ -305,8 +299,8 @@ public class ReinjectionTestCase extends AbstractComponentFactoryTest {
         final ComponentMonitor cm = new NullComponentMonitor();
         Reinjector reinjector = new Reinjector(parent, cm);
 
-        assertEquals(6, (int) (Integer) reinjector.reinject(NeedsShoe.class, NeedsShoe.M.doIt));
-        assertEquals(6, (int) (Integer) reinjector.reinject(NeedsShoe.class, new MethodInjection(DOIT_METHOD)));
+        assertEquals(6, (int) (Integer) reinjector.reInject(NeedsShoe.class, NeedsShoe.M.doIt));
+        assertEquals(6, (int) (Integer) reinjector.reInject(NeedsShoe.class, new MethodInjection(DOIT_METHOD)));
 
     }
 
@@ -324,7 +318,7 @@ public class ReinjectionTestCase extends AbstractComponentFactoryTest {
         };
         Reinjector reinjector = new Reinjector(parent, cm);
 
-        assertEquals(4444, (int) (Integer) reinjector.reinject(NeedsShoe.class, DOIT_METHOD));
+        assertEquals(4444, (int) (Integer) reinjector.reInject(NeedsShoe.class, DOIT_METHOD));
 
     }
 
@@ -342,7 +336,7 @@ public class ReinjectionTestCase extends AbstractComponentFactoryTest {
         };
         Reinjector reinjector = new Reinjector(parent, cm);
 
-        assertEquals(6, (int) (Integer) reinjector.reinject(NeedsShoe.class, DOIT_METHOD));
+        assertEquals(6, (int) (Integer) reinjector.reInject(NeedsShoe.class, DOIT_METHOD));
 
     }
 
@@ -360,7 +354,7 @@ public class ReinjectionTestCase extends AbstractComponentFactoryTest {
         };
         Reinjector reinjector = new Reinjector(parent, cm);
 
-        Object retval = reinjector.reinject(NeedsShoe.class, DOIT_METHOD);
+        Object retval = reinjector.reInject(NeedsShoe.class, DOIT_METHOD);
         assertTrue(retval == null);
 
     }

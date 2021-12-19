@@ -18,6 +18,7 @@ import com.picocontainer.behaviors.AbstractBehavior;
 import com.picocontainer.parameters.ConstructorParameters;
 import com.picocontainer.parameters.FieldParameters;
 import com.picocontainer.parameters.MethodParameters;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.util.Properties;
@@ -27,18 +28,19 @@ import java.util.Properties;
  */
 @SuppressWarnings("serial")
 public class Reinjection extends CompositeInjection {
-  public Reinjection(final InjectionType reinjectionType, final PicoContainer parent) {
-    super(new ReinjectionInjectionType(parent), reinjectionType);
+  public Reinjection(final InjectionType reInjectionType, final PicoContainer parent) {
+    super(new ReInjectionInjectionType(parent), reInjectionType);
   }
 
-  private static class ReinjectionInjector<T> extends AbstractInjector<T> {
+  private static class ReInjectionInjector<T> extends AbstractInjector<T> {
+    @NotNull
     private final PicoContainer parent;
 
-    ReinjectionInjector(
-        final Object key,
-        final Class<T> impl,
-        final ComponentMonitor monitor,
-        final PicoContainer parent,
+    ReInjectionInjector(
+        @NotNull final Object key,
+        @NotNull final Class<T> impl,
+        @NotNull final ComponentMonitor monitor,
+        @NotNull final PicoContainer parent,
         final boolean useNames,
         final ConstructorParameters constructorParams,
         final FieldParameters[] fieldParams,
@@ -53,10 +55,10 @@ public class Reinjection extends CompositeInjection {
     }
   }
 
-  private static class ReinjectionInjectionType extends AbstractInjectionType {
+  private static class ReInjectionInjectionType extends AbstractInjectionType {
     private final PicoContainer parent;
 
-    ReinjectionInjectionType(final PicoContainer parent) {
+    ReInjectionInjectionType(final PicoContainer parent) {
       this.parent = parent;
     }
 
@@ -71,16 +73,7 @@ public class Reinjection extends CompositeInjection {
         final FieldParameters[] fieldParams,
         final MethodParameters[] methodParams) {
       final boolean useNames = AbstractBehavior.arePropertiesPresent(componentProps, Characteristics.USE_NAMES, true);
-      return new ReinjectionInjector<>(
-          key,
-          impl,
-          monitor,
-          parent,
-          useNames,
-          constructorParams,
-          fieldParams,
-          methodParams
-      );
+      return new ReInjectionInjector<>(key, impl, monitor, parent, useNames, constructorParams, fieldParams, methodParams);
     }
   }
 }

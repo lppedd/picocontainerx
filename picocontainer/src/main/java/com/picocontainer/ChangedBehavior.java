@@ -11,7 +11,7 @@
 package com.picocontainer;
 
 /**
- * Behaviors modify the components created by a Injector with additional behaviors.
+ * Behaviors modify the components created by an Injector with additional behaviors.
  *
  * @author Paul Hammant
  * @author Jörg Schaible

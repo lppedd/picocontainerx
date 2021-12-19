@@ -14,6 +14,7 @@ import com.picocontainer.monitors.NullComponentMonitor;
 import com.picocontainer.parameters.ConstructorParameters;
 import com.picocontainer.parameters.FieldParameters;
 import com.picocontainer.parameters.MethodParameters;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
@@ -26,10 +27,11 @@ import java.util.Properties;
  */
 @SuppressWarnings({"serial", "RedundantInterfaceDeclaration"})
 public class AbstractBehavior implements ComponentFactory, Serializable, Behavior {
+  @Nullable
   private ComponentFactory delegate;
 
   @Override
-  public ComponentFactory wrap(final ComponentFactory delegate) {
+  public ComponentFactory wrap(@Nullable final ComponentFactory delegate) {
     this.delegate = delegate;
     return this;
   }
@@ -76,6 +78,7 @@ public class AbstractBehavior implements ComponentFactory, Serializable, Behavio
   @Override
   public void accept(final PicoVisitor visitor) {
     visitor.visitComponentFactory(this);
+
     if (delegate != null) {
       delegate.accept(visitor);
     }
@@ -93,17 +96,22 @@ public class AbstractBehavior implements ComponentFactory, Serializable, Behavio
   }
 
   /**
-   * Checks to see if one or more properties in the parameter {@code present} are available in
-   * the {@code current} parameter.
+   * Checks to see if one or more properties in the parameter {@code present}
+   * are available in the {@code current} parameter.
    *
    * @param current the current set of properties to check
-   * @param present the properties to check for.
-   * @param compareValueToo If set to {@code true}, then we also check the <em>value</em> of the property to make
-   * sure it matches. Some items in {@link Characteristics} have both a {@code true} and a {@code false} value.
+   * @param present the properties to check for
+   * @param compareValueToo if set to {@code true}, then we also check the <em>value</em>
+   *     of the property to make sure it matches.
+   *     Some items in {@link Characteristics} have both a {@code true} and a {@code false} value
+   *
    * @return {@code true} if the property is present <em>and</em> the value that exists equals
-   * the value of {@code compareValueToo}
+   *     the value of {@code compareValueToo}
    */
-  public static boolean arePropertiesPresent(final Properties current, final Properties present, final boolean compareValueToo) {
+  public static boolean arePropertiesPresent(
+      @NotNull final Properties current,
+      @NotNull final Properties present,
+      final boolean compareValueToo) {
     final Enumeration<?> keys = present.keys();
 
     while (keys.hasMoreElements()) {
@@ -123,7 +131,9 @@ public class AbstractBehavior implements ComponentFactory, Serializable, Behavio
     return true;
   }
 
-  public static boolean removePropertiesIfPresent(final Properties current, final Properties present) {
+  public static boolean removePropertiesIfPresent(
+      @NotNull final Properties current,
+      @NotNull final Properties present) {
     if (!arePropertiesPresent(current, present, true)) {
       return false;
     }
@@ -139,7 +149,9 @@ public class AbstractBehavior implements ComponentFactory, Serializable, Behavio
   }
 
   @Nullable
-  public static String getAndRemovePropertiesIfPresentByKey(final Properties current, final Properties present) {
+  public static String getAndRemovePropertiesIfPresentByKey(
+      @NotNull final Properties current,
+      @NotNull final Properties present) {
     if (!arePropertiesPresent(current, present, false)) {
       return null;
     }
@@ -155,7 +167,9 @@ public class AbstractBehavior implements ComponentFactory, Serializable, Behavio
     return value;
   }
 
-  protected void mergeProperties(final Properties into, final Properties from) {
+  protected void mergeProperties(
+      @NotNull final Properties into,
+      @NotNull final Properties from) {
     final Enumeration<?> e = from.propertyNames();
 
     while (e.hasMoreElements()) {
@@ -172,16 +186,12 @@ public class AbstractBehavior implements ComponentFactory, Serializable, Behavio
   }
 
   /**
-   * <p>
    * {@link ComponentAdapter} which decorates another adapter.
-   * </p>
    * <p>
    * This adapter supports a {@link ComponentMonitorStrategy} and will propagate change of monitor
    * to the delegate if the delegate itself support the monitor strategy.
-   * </p>
    * <p>
    * This adapter also supports a {@link Behavior} and a {@link LifecycleStrategy} if the delegate does.
-   * </p>
    *
    * @author Jon Tirsen
    * @author Aslak Hellesoy
@@ -192,9 +202,10 @@ public class AbstractBehavior implements ComponentFactory, Serializable, Behavio
                  ComponentMonitorStrategy,
                  LifecycleStrategy,
                  Serializable {
+    @NotNull
     protected final ComponentAdapter<T> delegate;
 
-    public AbstractChangedBehavior(final ComponentAdapter<T> delegate) {
+    public AbstractChangedBehavior(@NotNull final ComponentAdapter<T> delegate) {
       this.delegate = delegate;
     }
 
@@ -218,13 +229,14 @@ public class AbstractBehavior implements ComponentFactory, Serializable, Behavio
       delegate.verify(container);
     }
 
+    @NotNull
     @Override
     public final ComponentAdapter<T> getDelegate() {
       return delegate;
     }
 
     @Override
-    public final <U extends ComponentAdapter> U findAdapterOfType(final Class<U> adapterType) {
+    public final <U extends ComponentAdapter<?>> U findAdapterOfType(final Class<U> adapterType) {
       return adapterType.isAssignableFrom(getClass())
           ? (U) this
           : delegate.findAdapterOfType(adapterType);
@@ -346,7 +358,7 @@ public class AbstractBehavior implements ComponentFactory, Serializable, Behavio
 
     @Override
     public String toString() {
-      return getDescriptor() + ":" + delegate.toString();
+      return getDescriptor() + ":" + delegate;
     }
   }
 }

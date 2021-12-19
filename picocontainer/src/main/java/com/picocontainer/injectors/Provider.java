@@ -9,14 +9,11 @@
 package com.picocontainer.injectors;
 
 /**
- * <p>
  * Providers are a type of injector that can participate in injection via a custom method.
- * </p>
  * <p>
  * Implementers of this class must implement a single method called {@code provide}.
  * That method must return the component type intended to be provided.
  * The method can accept parameters that PicoContainer will satisfy.
- * </p>
  */
 @SuppressWarnings("MarkerInterface")
 public interface Provider {}

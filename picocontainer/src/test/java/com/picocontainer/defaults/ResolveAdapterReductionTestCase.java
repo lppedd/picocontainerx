@@ -173,6 +173,7 @@ public class ResolveAdapterReductionTestCase {
     }
 
     public static class FooNameBinding implements NameBinding {
+        @Override
         public String getName() {
             return "";
         }

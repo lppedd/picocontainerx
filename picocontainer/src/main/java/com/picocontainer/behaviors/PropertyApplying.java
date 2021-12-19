@@ -131,6 +131,7 @@ public final class PropertyApplying extends AbstractBehavior {
             return componentInstance;
         }
 
+        @Override
         public String getDescriptor() {
             return "PropertyApplied";
         }

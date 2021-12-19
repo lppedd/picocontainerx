@@ -113,39 +113,49 @@ public abstract class FactoryInjector<T> implements com.picocontainer.Injector<T
     return typeArgumentsAsClasses;
   }
 
+    @Override
     public Object getComponentKey() {
         return key;
     }
 
+    @Override
     public Class<? extends T> getComponentImplementation() {
         return key;
     }
 
+    @Override
     public void accept(final PicoVisitor visitor) {
         visitor.visitComponentAdapter(this);
     }
 
+    @Override
     public ComponentAdapter<T> getDelegate() {
         return null;
     }
 
-    public <U extends ComponentAdapter> U findAdapterOfType(final Class<U> adapterType) {
+    @Override
+    public <U extends ComponentAdapter<?>> U findAdapterOfType(final Class<U> adapterType) {
         return null;
     }
 
+    @Override
     public abstract T getComponentInstance(PicoContainer container, Type into);
 
+    @Override
     public Object decorateComponentInstance(final PicoContainer container, final Type into, final T instance) {
         return null;
     }
 
+    @Override
     public Object partiallyDecorateComponentInstance(final PicoContainer container, final Type into, final T instance, final Class<?> superclassPortion) {
         return null;
     }
 
+    @Override
     public void verify(final PicoContainer container) {
     }
 
+    @Override
     public String getDescriptor() {
         return "FactoryInjector-";
     }

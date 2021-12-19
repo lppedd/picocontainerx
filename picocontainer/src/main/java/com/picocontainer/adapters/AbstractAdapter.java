@@ -15,12 +15,14 @@ import com.picocontainer.ComponentMonitorStrategy;
 import com.picocontainer.PicoVisitor;
 import com.picocontainer.injectors.Provider;
 import com.picocontainer.injectors.ProviderAdapter;
-import com.picocontainer.monitors.AbstractComponentMonitor;
 import com.picocontainer.monitors.NullComponentMonitor;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * <p>
@@ -39,8 +41,13 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 public abstract class AbstractAdapter<T> implements ComponentAdapter<T>, ComponentMonitorStrategy, Serializable {
+  @NotNull
   private final Object key;
-  private final Class<T> impl;
+
+  @NotNull
+  private final Class<? extends T> impl;
+
+  @NotNull
   private ComponentMonitor monitor;
 
   /**
@@ -49,9 +56,10 @@ public abstract class AbstractAdapter<T> implements ComponentAdapter<T>, Compone
    * @param key the search key for this implementation
    * @param impl the concrete implementation
    */
-  public AbstractAdapter(final Object key, final Class impl) {
-    this(key, impl, new AbstractComponentMonitor());
-    monitor = new NullComponentMonitor();
+  public AbstractAdapter(
+      @NotNull final Object key,
+      @NotNull final Class<? extends T> impl) {
+    this(key, impl, new NullComponentMonitor());
   }
 
   /**
@@ -61,29 +69,19 @@ public abstract class AbstractAdapter<T> implements ComponentAdapter<T>, Compone
    * @param impl the concrete implementation
    * @param monitor the component monitor used by this {@code ComponentAdapter}
    */
-  public AbstractAdapter(final Object key, final Class impl, final ComponentMonitor monitor) {
-    if (monitor == null) {
-      throw new NullPointerException("ComponentMonitor==null");
-    }
-
-    this.monitor = monitor;
-
-    if (impl == null) {
-      throw new NullPointerException("impl");
-    }
-
-    this.key = key;
-    this.impl = impl;
+  public AbstractAdapter(
+      @NotNull final Object key,
+      @NotNull final Class<? extends T> impl,
+      @NotNull final ComponentMonitor monitor) {
+    this.key = requireNonNull(key, "The key cannot be null");
+    this.impl = requireNonNull(impl, "The implementation's class cannot be null");
+    this.monitor = requireNonNull(monitor, "The monitor cannot be null");
     checkTypeCompatibility();
   }
 
   @NotNull
   @Override
   public Object getComponentKey() {
-    if (key == null) {
-      throw new NullPointerException("key");
-    }
-
     return key;
   }
 
@@ -99,16 +97,12 @@ public abstract class AbstractAdapter<T> implements ComponentAdapter<T>, Compone
 
       if (Provider.class.isAssignableFrom(impl)) {
         if (!componentType.isAssignableFrom(ProviderAdapter.getProvideMethod(impl).getReturnType())) {
-          throw newCCE(componentType);
+          throw new ClassCastException(impl.getName() + " is not a " + componentType.getName());
         }
       } else if (!componentType.isAssignableFrom(impl)) {
-        throw newCCE(componentType);
+        throw new ClassCastException(impl.getName() + " is not a " + componentType.getName());
       }
     }
-  }
-
-  private ClassCastException newCCE(final Class<?> componentType) {
-    return new ClassCastException(impl.getName() + " is not a " + componentType.getName());
   }
 
   @Override
@@ -121,19 +115,21 @@ public abstract class AbstractAdapter<T> implements ComponentAdapter<T>, Compone
     visitor.visitComponentAdapter(this);
   }
 
+  @NotNull
   @Override
-  public ComponentMonitor changeMonitor(final ComponentMonitor monitor) {
+  public ComponentMonitor changeMonitor(@NotNull final ComponentMonitor monitor) {
     final ComponentMonitor returnValue = this.monitor;
-    this.monitor = monitor;
+    this.monitor = requireNonNull(monitor, "The monitor cannot be null");
     return returnValue;
   }
 
+  @NotNull
   @Override
   public ComponentMonitor currentMonitor() {
     return monitor;
   }
 
-  @Nullable
+  @Contract("-> null")
   @Override
   public final ComponentAdapter<T> getDelegate() {
     return null;
@@ -141,16 +137,7 @@ public abstract class AbstractAdapter<T> implements ComponentAdapter<T>, Compone
 
   @Nullable
   @Override
-  public final <U extends ComponentAdapter> U findAdapterOfType(final Class<U> adapterType) {
-    if (adapterType.isAssignableFrom(getClass())) {
-      return (U) this;
-    }
-
-    // noinspection SimplifiableIfStatement
-    if (getDelegate() != null) {
-      return getDelegate().findAdapterOfType(adapterType);
-    }
-
-    return null;
+  public final <U extends ComponentAdapter<?>> U findAdapterOfType(final Class<U> adapterType) {
+    return adapterType.isAssignableFrom(getClass()) ? (U) this : null;
   }
 }

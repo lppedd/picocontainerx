@@ -310,22 +310,27 @@ public class DefaultPicoContainerLifecycleTestCase {
     @Test public void testCanSpecifyLifeCycleStrategyForInstanceRegistrationWhenSpecifyingComponentFactory()
         throws Exception {
         LifecycleStrategy strategy = new LifecycleStrategy() {
+            @Override
             public void start(final Object component) {
                 ((StringBuffer)component).append("start>");
             }
 
+            @Override
             public void stop(final Object component) {
                 ((StringBuffer)component).append("stop>");
             }
 
+            @Override
             public void dispose(final Object component) {
                 ((StringBuffer)component).append("dispose>");
             }
 
+            @Override
             public boolean hasLifecycle(final Class type) {
                 return true;
             }
 
+            @Override
             public boolean isLazy(final ComponentAdapter<?> adapter) {
                 return false;
             }
@@ -347,22 +352,27 @@ public class DefaultPicoContainerLifecycleTestCase {
         throws Exception
     {
         LifecycleStrategy strategy = new LifecycleStrategy() {
+            @Override
             public void start(final Object component) {
                 ((StringBuffer)component).append("start>");
             }
 
+            @Override
             public void stop(final Object component) {
                 ((StringBuffer)component).append("stop>");
             }
 
+            @Override
             public void dispose(final Object component) {
                 ((StringBuffer)component).append("dispose>");
             }
 
+            @Override
             public boolean hasLifecycle(final Class type) {
                 return true;
             }
 
+            @Override
             public boolean isLazy(final ComponentAdapter<?> adapter) {
                 return false;
             }

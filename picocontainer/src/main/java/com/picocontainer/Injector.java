@@ -8,6 +8,9 @@
  *****************************************************************************/
 package com.picocontainer;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.Type;
 
 /**
@@ -23,10 +26,9 @@ public interface Injector<T> extends ComponentAdapter<T> {
    * @param instance the instance to
    */
   Object decorateComponentInstance(
-      final PicoContainer container,
-      final Type into,
-      final T instance
-  );
+      @NotNull final PicoContainer container,
+      @NotNull final Type into,
+      @NotNull final T instance);
 
   /**
    * Does a partial decoration.
@@ -39,9 +41,8 @@ public interface Injector<T> extends ComponentAdapter<T> {
    * @param superclassPortion the portion of the object to decorate.
    */
   Object partiallyDecorateComponentInstance(
-      final PicoContainer container,
-      final Type into,
-      final T instance,
-      final Class<?> superclassPortion
-  );
+      @NotNull final PicoContainer container,
+      @NotNull final Type into,
+      @NotNull final T instance,
+      @Nullable final Class<?> superclassPortion);
 }

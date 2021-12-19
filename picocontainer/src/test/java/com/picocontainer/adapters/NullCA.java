@@ -14,32 +14,40 @@ public class NullCA implements ComponentAdapter {
         this.key = key;
     }
 
+    @Override
     public Object getComponentKey() {
         return key;
     }
 
+    @Override
     public Class getComponentImplementation() {
         return NOTHING.class;
     }
 
+    @Override
     public Object getComponentInstance(final PicoContainer container, final Type into)  {
         return null;
     }
 
+    @Override
     public void verify(final PicoContainer container)  {
     }
 
+    @Override
     public void accept(final PicoVisitor visitor) {
     }
 
+    @Override
     public ComponentAdapter getDelegate() {
         return null;
     }
 
+    @Override
     public ComponentAdapter findAdapterOfType(final Class adapterType) {
         return null;
     }
 
+    @Override
     public String getDescriptor() {
         return "Null-CA";
     }

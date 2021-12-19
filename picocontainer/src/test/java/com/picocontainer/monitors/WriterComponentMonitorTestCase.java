@@ -104,15 +104,18 @@ public class WriterComponentMonitorTestCase  {
             monitor.lifecycleInvocationFailed(new TransientPicoContainer(),
                                                        new AbstractAdapter(Map.class, HashMap.class) {
 
+                                                           @Override
                                                            public Object getComponentInstance(final PicoContainer container, final Type into)
                                                                throws PicoCompositionException {
                                                                return "x";
                                                            }
 
+                                                           @Override
                                                            public void verify(final PicoContainer container)
                                                                throws PicoCompositionException{
                                                            }
 
+                                                           @Override
                                                            public String getDescriptor() {
                                                                return null;
                                                            }

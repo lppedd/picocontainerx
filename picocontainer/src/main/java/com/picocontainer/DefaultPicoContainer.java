@@ -37,6 +37,7 @@ import com.picocontainer.parameters.ConstructorParameters;
 import com.picocontainer.parameters.DefaultConstructorParameter;
 import com.picocontainer.parameters.FieldParameters;
 import com.picocontainer.parameters.MethodParameters;
+import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Provider;
 import java.io.Serializable;
@@ -83,12 +84,13 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
   protected final ComponentFactory componentFactory;
 
   /**
-   * Parent picocontainer
+   * Parent PicoContainer.
    */
+  @Nullable
   private PicoContainer parent;
 
   /**
-   * All picocontainer children.
+   * All PicoContainer children.
    */
   private final Set<PicoContainer> children = new HashSet<>();
 
@@ -177,7 +179,9 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
    * @param parent the parent container (used for component dependency lookups).
    * @param componentFactories the factory to use for creation of ComponentAdapters.
    */
-  public DefaultPicoContainer(final PicoContainer parent, final ComponentFactory... componentFactories) {
+  public DefaultPicoContainer(
+      @Nullable final PicoContainer parent,
+      final ComponentFactory... componentFactories) {
     this(parent, new StartableLifecycleStrategy(new NullComponentMonitor()), new NullComponentMonitor(), componentFactories);
   }
 
@@ -194,14 +198,21 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
    *
    * @param parent the parent container (used for component dependency lookups).
    * @param lifecycle the lifecycle strategy chosen for registered
-   * instance (not implementations!)
+   *     instance (not implementations!)
    * @param componentFactories the factory to use for creation of ComponentAdapters.
    */
-  public DefaultPicoContainer(final PicoContainer parent, final LifecycleStrategy lifecycle, final ComponentFactory... componentFactories) {
+  public DefaultPicoContainer(
+      @Nullable final PicoContainer parent,
+      final LifecycleStrategy lifecycle,
+      final ComponentFactory... componentFactories) {
     this(parent, lifecycle, new NullComponentMonitor(), componentFactories);
   }
 
-  public DefaultPicoContainer(final PicoContainer parent, final LifecycleStrategy lifecycle, final ComponentMonitor monitor, final ComponentFactory... componentFactories) {
+  public DefaultPicoContainer(
+      @Nullable final PicoContainer parent,
+      final LifecycleStrategy lifecycle,
+      final ComponentMonitor monitor,
+      final ComponentFactory... componentFactories) {
     if (componentFactories.length == 0) {
       throw new NullPointerException("at least one componentFactory");
     }
@@ -247,7 +258,9 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
    * @param parent the parent container (used for component dependency lookups).
    * @param monitor the ComponentMonitor to use
    */
-  public DefaultPicoContainer(final PicoContainer parent, final ComponentMonitor monitor) {
+  public DefaultPicoContainer(
+      @Nullable final PicoContainer parent,
+      final ComponentMonitor monitor) {
     this(parent, new StartableLifecycleStrategy(monitor), monitor, new AdaptingBehavior());
   }
 
@@ -259,7 +272,10 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
    * @param lifecycle the lifecycle strategy to use.
    * @param monitor the ComponentMonitor to use
    */
-  public DefaultPicoContainer(final PicoContainer parent, final LifecycleStrategy lifecycle, final ComponentMonitor monitor) {
+  public DefaultPicoContainer(
+      @Nullable final PicoContainer parent,
+      final LifecycleStrategy lifecycle,
+      final ComponentMonitor monitor) {
     this(parent, lifecycle, monitor, new AdaptingBehavior());
   }
 
@@ -324,7 +340,7 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
     private final T instance;
 
     private LateInstance(final Object key, final T instance) {
-      super(key, instance.getClass());
+      super(key, (Class<T>) instance.getClass());
       this.instance = instance;
     }
 
@@ -395,7 +411,7 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
     }
 
     @Override
-    public <U extends ComponentAdapter> U findAdapterOfType(final Class<U> adapterType) {
+    public <U extends ComponentAdapter<?>> U findAdapterOfType(final Class<U> adapterType) {
       return ca.findAdapterOfType(adapterType);
     }
 
@@ -415,7 +431,10 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
     return getComponentAdapter(componentType, nameBinding, null);
   }
 
-  private <T> ComponentAdapter<T> getComponentAdapter(final Generic<T> componentType, final NameBinding componentNameBinding, final Class<? extends Annotation> binding) {
+  private <T> ComponentAdapter<T> getComponentAdapter(
+      final Generic<T> componentType,
+      final NameBinding componentNameBinding,
+      final Class<? extends Annotation> binding) {
     // See http://jira.codehaus.org/secure/ViewIssue.jspa?key=PICO-115
     final ComponentAdapter<T> adapterByKey = (ComponentAdapter<T>) getComponentAdapter(componentType);
 
@@ -457,12 +476,16 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
   }
 
   @Override
-  public <T> ComponentAdapter<T> getComponentAdapter(final Class<T> componentType, final Class<? extends Annotation> binding) {
+  public <T> ComponentAdapter<T> getComponentAdapter(
+      final Class<T> componentType,
+      final Class<? extends Annotation> binding) {
     return getComponentAdapter(Generic.get(componentType), null, binding);
   }
 
   @Override
-  public <T> ComponentAdapter<T> getComponentAdapter(final Generic<T> componentType, final Class<? extends Annotation> binding) {
+  public <T> ComponentAdapter<T> getComponentAdapter(
+      final Generic<T> componentType,
+      final Class<? extends Annotation> binding) {
     return getComponentAdapter(componentType, null, binding);
   }
 
@@ -477,12 +500,16 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
   }
 
   @Override
-  public <T> List<ComponentAdapter<T>> getComponentAdapters(final Class<T> componentType, final Class<? extends Annotation> binding) {
+  public <T> List<ComponentAdapter<T>> getComponentAdapters(
+      final Class<T> componentType,
+      final Class<? extends Annotation> binding) {
     return getComponentAdapters(Generic.get(componentType), binding);
   }
 
   @Override
-  public <T> List<ComponentAdapter<T>> getComponentAdapters(final Generic<T> componentType, final Class<? extends Annotation> binding) {
+  public <T> List<ComponentAdapter<T>> getComponentAdapters(
+      final Generic<T> componentType,
+      final Class<? extends Annotation> binding) {
     if (componentType == null) {
       return Collections.emptyList();
     }
@@ -654,8 +681,8 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
       final Object implOrInstance,
       final Properties properties,
       final ConstructorParameters constructorParameters,
-      final FieldParameters[] fieldParameters,
-      final MethodParameters[] methodParameters) {
+      final FieldParameters @Nullable [] fieldParameters,
+      final MethodParameters @Nullable [] methodParameters) {
     Parameter[] tweakedParameters = constructorParameters != null ? constructorParameters.getParams() : null;
 
     if (key instanceof Generic) {
@@ -877,6 +904,7 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
    *
    * @param component the component that will be returned for getComponent(..)
    * @param componentAdapter the component adapter that made that component
+   *
    * @return the component (the same as that passed in by default)
    */
   protected Object decorateComponent(final Object component, final ComponentAdapter<?> componentAdapter) {
@@ -1043,6 +1071,7 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
    * to prevent IllegalStateException upon stop
    *
    * @param child the child PicoContainer
+   *
    * @return A boolean, {@code true} if the container is started
    */
   private boolean childStarted(final PicoContainer child) {
@@ -1442,7 +1471,9 @@ public class DefaultPicoContainer implements MutablePicoContainer, Converting, C
       return DefaultPicoContainer.this.addComponent(key,
           implOrInstance,
           properties,
-          new ConstructorParameters(parameters), null, null
+          new ConstructorParameters(parameters),
+          null,
+          null
       );
     }
 

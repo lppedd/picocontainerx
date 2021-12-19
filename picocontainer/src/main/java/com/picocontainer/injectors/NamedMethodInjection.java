@@ -111,7 +111,7 @@ public class NamedMethodInjection extends AbstractInjectionType {
     protected void unsatisfiedDependencies(
         final PicoContainer container,
         final Set<Type> unsatisfiableDependencyTypes,
-        final List<AccessibleObject> unsatisfiableDependencyMembers) {
+        final List<? extends AccessibleObject> unsatisfiableDependencyMembers) {
       if (!optional) {
         throw new UnsatisfiableDependenciesException(
             getComponentImplementation().getName()
